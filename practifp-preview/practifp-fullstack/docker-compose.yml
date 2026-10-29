@@ -1,0 +1,13 @@
+# Levanta MySQL con el esquema ya cargado:  docker compose up -d
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: practifp
+    ports: ["3306:3306"]
+    volumes:
+      - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - dbdata:/var/lib/mysql
+volumes:
+  dbdata:
