@@ -1,0 +1,29 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen contraseñas)
+.env
+.env.*
+!.env.example
+!.env.produccion.example
+!.env.tidb.example
+.env.tidb
+
+# Compilación
+dist/
+build/
+
+# Archivos subidos por los usuarios
+backend/uploads/cv/*
+backend/uploads/proyectos/*
+!backend/uploads/**/.gitkeep
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Vercel
+.vercel

@@ -1,0 +1,44 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 576 >>
+stream
+BT /F2 20 Tf 72 760 Td (Curriculum de ejemplo) Tj ET
+BT /F1 11 Tf 72 735 Td (Documento de prueba generado para los datos de ejemplo de PractiFP.) Tj ET
+BT /F2 13 Tf 72 700 Td (Formacion) Tj ET
+BT /F1 11 Tf 72 682 Td (Ciclo Formativo de Grado Superior (2.o curso)) Tj ET
+BT /F2 13 Tf 72 650 Td (Conocimientos) Tj ET
+BT /F1 11 Tf 72 632 Td (Consulta las tecnologias y el portfolio en el perfil de PractiFP.) Tj ET
+BT /F2 13 Tf 72 600 Td (Contacto) Tj ET
+BT /F1 11 Tf 72 582 Td (Disponible a traves de la plataforma PractiFP.) Tj ET
+0.055 0.369 0.357 RG 2 w 72 750 m 523 750 l S
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000000877 00000 n 
+0000000947 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+1022
+%%EOF

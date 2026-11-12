@@ -1,0 +1,6 @@
+{
+  "name": "practifp",
+  "private": true,
+  "description": "PractiFP: prácticas de Formación Profesional. Este archivo solo sirve para el despliegue en Vercel (api/index.js); el frontend y el backend tienen su propio package.json.",
+  "type": "module"
+}

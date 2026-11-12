@@ -1,0 +1,31 @@
+{
+  "name": "practifp-backend",
+  "version": "0.1.0",
+  "description": "API REST de PractiFP (Node.js + Express + MariaDB)",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "db:reset": "node scripts/db-reset.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "db:esquema": "node scripts/db-esquema.js",
+    "crear-admin": "node scripts/crear-admin.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.22.3",
+    "jsonwebtoken": "^9.0.2",
+    "mariadb": "^3.5.5",
+    "multer": "^2.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

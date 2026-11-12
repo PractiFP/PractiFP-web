@@ -1,0 +1,5 @@
+backend/uploads
+backend/tests
+backend/.env
+frontend/.env
+docs/prototipo.html

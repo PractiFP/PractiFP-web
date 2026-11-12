@@ -1,0 +1,55 @@
+/* Identidad visual de PractiFP: verde petróleo + amarillo taller.
+   Todos los colores se definen aquí como variables; el modo oscuro solo las redefine. */
+:root {
+  --bg: #F4F7F6;
+  --surface: #FFFFFF;
+  --surface-2: #E9F0EF;
+  --fg: #11211F;
+  --muted: #566966;
+  --line: #D3DFDD;
+  --primary: #0E5E5B;
+  --primary-h: #0A4A48;
+  --primary-fg: #FFFFFF;
+  --primary-soft: #DCEDEB;
+  --accent: #F2B33D;
+  --accent-fg: #2B1D00;
+  --accent-soft: #FCEFD3;
+  /* Colores de estado oscurecidos para un contraste mínimo de 4,5:1 (WCAG AA) también sobre fondos teñidos */
+  --ok: #146034;
+  --warn: #7A4A08;
+  --bad: #962C13;
+  --info: #1F4DB0;
+  --shadow: 0 1px 2px rgb(16 40 38 / .06), 0 4px 16px rgb(16 40 38 / .06);
+
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  --r: 10px;
+  --r-sm: 6px;
+  --ancho-max: 1180px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0B1514;
+    --surface: #111F1E;
+    --surface-2: #182B29;
+    --fg: #E4EEEC;
+    --muted: #93A8A5;
+    --line: #253937;
+    --primary: #4DBAB2;
+    --primary-h: #6FCFC8;
+    --primary-fg: #05201E;
+    --primary-soft: #163B38;
+    --accent: #F5C05A;
+    --accent-soft: #3A2F17;
+    --ok: #4CC27F;
+    --warn: #E3A64E;
+    --bad: #F07B57;
+    --info: #7DA6FF;
+    --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25);
+    color-scheme: dark;
+  }
+}

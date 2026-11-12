@@ -1,0 +1,1610 @@
+<title>PractiFP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: cabecera fija + franja de demo; páginas públicas a ancho de lectura; paneles con barra lateral que pasa a pestañas en móvil.
+   Identidad: verde petróleo (formación, confianza) + amarillo taller (FP, oficio) sobre neutros con matiz verdoso. */
+:root{
+  --bg:#F4F7F6; --surface:#FFFFFF; --surface-2:#E9F0EF; --fg:#11211F; --muted:#566966;
+  --line:#D3DFDD; --primary:#0E5E5B; --primary-h:#0A4A48; --primary-fg:#FFFFFF; --primary-soft:#DCEDEB;
+  --accent:#F2B33D; --accent-fg:#2B1D00; --accent-soft:#FCEFD3;
+  --ok:#1E7F47; --warn:#A8670E; --bad:#B9381A; --info:#2459C9;
+  --shadow:0 1px 2px rgb(16 40 38 / .06), 0 4px 16px rgb(16 40 38 / .06);
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --r:10px; --r-sm:6px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0B1514; --surface:#111F1E; --surface-2:#182B29; --fg:#E4EEEC; --muted:#93A8A5;
+  --line:#253937; --primary:#4DBAB2; --primary-h:#6FCFC8; --primary-fg:#05201E; --primary-soft:#163B38;
+  --accent:#F5C05A; --accent-fg:#2B1D00; --accent-soft:#3A2F17;
+  --ok:#4CC27F; --warn:#E3A64E; --bad:#F07B57; --info:#7DA6FF;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0B1514; --surface:#111F1E; --surface-2:#182B29; --fg:#E4EEEC; --muted:#93A8A5;
+  --line:#253937; --primary:#4DBAB2; --primary-h:#6FCFC8; --primary-fg:#05201E; --primary-soft:#163B38;
+  --accent:#F5C05A; --accent-fg:#2B1D00; --accent-soft:#3A2F17;
+  --ok:#4CC27F; --warn:#E3A64E; --bad:#F07B57; --info:#7DA6FF;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.7rem,3.4vw,2.4rem);font-weight:800}
+h2{font-size:1.35rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--primary)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-size:.82em;letter-spacing:.02em}
+.ico{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+.ico.sm{width:15px;height:15px;vertical-align:-2px}
+.ico.fill{fill:currentColor}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+
+/* Cabecera */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;min-height:62px}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.3rem;color:var(--fg);text-decoration:none;cursor:pointer;background:none;border:0;padding:0}
+.logo b{color:var(--primary)}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:var(--primary);display:grid;place-items:center;position:relative}
+.logo-mark::after{content:"";position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:3px;background:var(--accent);border:2px solid var(--surface)}
+.logo-mark span{color:var(--primary-fg);font-size:1rem;font-weight:800;line-height:1}
+.nav{display:flex;gap:4px;flex:1}
+.nav button{background:none;border:0;padding:8px 12px;border-radius:var(--r-sm);font-weight:500;color:var(--muted);cursor:pointer}
+.nav button:hover{color:var(--fg);background:var(--surface-2)}
+.nav button.on{color:var(--primary);background:var(--primary-soft);font-weight:600}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn.menu-btn{display:none}
+.user-pill{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem}
+@media (max-width:860px){
+  .nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--surface);border-bottom:1px solid var(--line);flex-direction:column;padding:8px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+  .nav.open{display:flex}
+  .nav button{text-align:left;padding:12px}
+  .btn.menu-btn{display:inline-flex}
+  .user-pill .uname{display:none}
+  .top .wrap{gap:10px}
+  .logo{margin-right:auto}
+}
+.demo{background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:.85rem}
+.demo .wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:7px}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--primary);color:var(--primary-fg)}
+
+/* Botones y formularios */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:var(--r-sm);border:1px solid transparent;font-weight:600;font-size:.92rem;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
+.btn-p{background:var(--primary);color:var(--primary-fg)}
+.btn-p:hover{background:var(--primary-h)}
+.btn-a{background:var(--accent);color:var(--accent-fg)}
+.btn-o{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.btn-o:hover{border-color:var(--primary);color:var(--primary)}
+.btn-g{background:none;color:var(--muted);padding:7px 10px}
+.btn-g:hover{color:var(--fg);background:var(--surface-2)}
+.btn-d{background:none;border-color:color-mix(in srgb,var(--bad) 40%,transparent);color:var(--bad)}
+.btn-d:hover{background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.btn-sm{padding:6px 11px;font-size:.84rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.icon-btn{width:36px;height:36px;padding:0}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-size:.82rem;font-weight:600;color:var(--fg)}
+.field .hint{font-size:.78rem;color:var(--muted)}
+.field .err{font-size:.8rem;color:var(--bad);font-weight:500}
+.inp{width:100%;padding:9px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--fg);min-width:0}
+.inp:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.inp.bad{border-color:var(--bad)}
+textarea.inp{min-height:96px;resize:vertical}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+.check{display:flex;align-items:center;gap:8px;font-size:.9rem;cursor:pointer}
+.check input{accent-color:var(--primary);width:16px;height:16px}
+
+/* Superficies */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.eyebrow{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--surface-2);color:var(--fg);white-space:nowrap}
+.chip.tec{background:var(--primary-soft);color:var(--primary)}
+.chip.opt{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.chip.ciclo{font-family:var(--f-mono);font-size:.74rem;background:var(--fg);color:var(--bg);border-radius:4px;padding:2px 7px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.st{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.74rem;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-ENVIADA{color:var(--info);background:color-mix(in srgb,var(--info) 13%,transparent)}
+.st-REVISADA{color:var(--primary);background:color-mix(in srgb,var(--primary) 13%,transparent)}
+.st-ENTREVISTA{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+.st-ACEPTADA,.st-APROBADA,.st-VERIFICADA,.st-ACTIVA{color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,transparent)}
+.st-RECHAZADA,.st-INACTIVA{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.st-PENDIENTE{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+.verif{color:var(--primary);display:inline-flex;align-items:center;gap:3px;font-size:.78rem;font-weight:600}
+.noverif{color:var(--muted);display:inline-flex;align-items:center;gap:3px;font-size:.78rem;font-weight:600}
+.elogo{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;color:#fff;flex:none;font-size:1rem;letter-spacing:.02em}
+.elogo.lg{width:72px;height:72px;font-size:1.5rem;border-radius:14px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;font-size:.9rem}
+.avatar.sm{width:30px;height:30px;font-size:.74rem}
+.avatar.lg{width:88px;height:88px;font-size:1.8rem;font-family:var(--f-display)}
+.stars{display:inline-flex;gap:1px;color:var(--accent)}
+.stars .ico{width:16px;height:16px}
+.stars .off{color:var(--line)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);background:var(--surface)}
+.notice{display:flex;gap:10px;padding:12px 14px;border-radius:var(--r-sm);background:var(--surface-2);font-size:.88rem;color:var(--fg)}
+.notice .ico{color:var(--primary);margin-top:2px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th{text-align:left;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.linkish{background:none;border:0;padding:0;color:var(--primary);font-weight:600;cursor:pointer;text-align:left}
+.linkish:hover{text-decoration:underline}
+
+/* Inicio */
+.hero{background:var(--surface);border-bottom:1px solid var(--line);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;padding-block:52px 44px;align-items:center}
+.hero h1{font-size:clamp(2rem,4.6vw,3.3rem);line-height:1.05}
+.hero h1 em{font-style:normal;color:var(--primary);background:linear-gradient(transparent 62%,var(--accent-soft) 62%)}
+.hero-lead{font-size:1.08rem;color:var(--muted);max-width:52ch;margin-top:16px}
+.searchbar{display:flex;gap:8px;margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:var(--shadow);flex-wrap:wrap}
+.searchbar .inp{border:0;box-shadow:none;flex:1 1 180px}
+.searchbar select.inp{flex:0 1 150px;border-left:1px solid var(--line);border-radius:0}
+@media (max-width:640px){.searchbar select.inp{border-left:0;border-top:1px solid var(--line);flex-basis:100%}}
+.ciclos-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.ciclo-tile{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;font-size:.85rem;font-weight:500}
+.ciclo-tile:hover{border-color:var(--primary)}
+.ticket{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.ticket .tk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow)}
+.ticket .tk:nth-child(2){margin-left:24px}
+.ticket .tk:nth-child(3){margin-left:8px}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr;padding-block:32px}}
+.section{padding-block:40px}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.how .card{display:flex;flex-direction:column;gap:8px}
+.how .num{font-family:var(--f-mono);font-size:.8rem;color:var(--primary);font-weight:600}
+@media (max-width:760px){.how{grid-template-columns:1fr}}
+
+/* Ofertas */
+.ocards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.ocard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s;min-width:0}
+.ocard:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.ocard .t{font-family:var(--f-display);font-weight:700;font-size:1.06rem;line-height:1.25}
+.ocard .emp{font-size:.86rem;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted)}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.ocard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:12px;margin-top:auto;font-size:.85rem}
+.pay{font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+.pay.no{color:var(--muted);font-weight:500}
+.fav{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--muted);flex:none}
+.fav:hover{color:var(--bad);border-color:var(--bad)}
+.fav.on{color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent);border-color:transparent}
+.search-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:22px;align-items:start;padding-block:28px}
+.filters{position:sticky;top:calc(env(safe-area-inset-top,0px) + 120px);display:flex;flex-direction:column;gap:16px}
+.filters .card{padding:16px;display:flex;flex-direction:column;gap:14px}
+.tec-pick{display:flex;flex-wrap:wrap;gap:6px}
+.tec-pick button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--muted)}
+.tec-pick button.on{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+.filters-toggle{display:none}
+@media (max-width:900px){
+  .search-layout{grid-template-columns:1fr}
+  .filters{position:static;display:none}
+  .filters.open{display:flex}
+  .filters-toggle{display:inline-flex}
+}
+.active-f{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.active-f button{display:inline-flex;align-items:center;gap:4px;border:0;background:var(--primary-soft);color:var(--primary);border-radius:999px;padding:3px 6px 3px 10px;font-size:.78rem;font-weight:600;cursor:pointer}
+
+/* Detalle */
+.detail{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;padding-block:28px;align-items:start}
+@media (max-width:900px){.detail{grid-template-columns:1fr}}
+@media (max-width:560px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.back{display:inline-flex;align-items:center;gap:4px;background:none;border:0;color:var(--muted);cursor:pointer;font-weight:500;padding:0;margin-top:22px}
+.back:hover{color:var(--primary)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.facts div{background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.facts b{font-size:.95rem;font-variant-numeric:tabular-nums}
+.prose{max-width:68ch;color:var(--fg)}
+.prose p+p{margin-top:10px}
+.timeline{display:flex;flex-direction:column;gap:0;position:relative}
+.tl-step{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;padding-bottom:18px;position:relative}
+.tl-step:not(:last-child)::before{content:"";position:absolute;left:17px;top:34px;bottom:2px;width:2px;background:var(--line)}
+.tl-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-weight:600;font-size:.85rem;background:var(--primary-soft);color:var(--primary);border:2px solid var(--surface);position:relative;z-index:1}
+.tl-step.opt .tl-num{background:var(--surface);border:2px dashed var(--line);color:var(--muted)}
+.tl-days{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);white-space:nowrap;padding-top:8px}
+.sticky-side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 120px);display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){.sticky-side{position:static}}
+.apply-card{border-color:var(--primary);border-width:2px}
+
+/* Mapa */
+.map-layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;padding-block:28px;align-items:start}
+@media (max-width:900px){.map-layout{grid-template-columns:1fr}}
+.elist{display:flex;flex-direction:column;gap:8px;max-height:600px;overflow:auto;padding-right:2px}
+.eitem{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:left;width:100%}
+.eitem:hover,.eitem.on{border-color:var(--primary)}
+.eitem.on{box-shadow:0 0 0 3px var(--primary-soft)}
+.map-box{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.map-svg{display:block;width:100%;height:auto}
+.map-svg .sea{fill:color-mix(in srgb,var(--info) 7%,var(--surface))}
+.map-svg .land{fill:var(--surface-2);stroke:color-mix(in srgb,var(--primary) 35%,var(--line));stroke-width:1.2}
+.map-svg .grat{stroke:var(--line);stroke-width:.6;stroke-dasharray:3 4}
+.map-svg .city{fill:var(--muted);font-size:11px;font-family:var(--f-body)}
+.mk{cursor:pointer}
+.mk .pinb{fill:var(--primary);stroke:var(--surface);stroke-width:2}
+.mk .dot{fill:var(--primary-fg)}
+.mk.on .pinb{fill:var(--accent);stroke:var(--fg)}
+.mk.on .dot{fill:var(--accent-fg)}
+.mk.dim{opacity:.25}
+.mk:hover .pinb{fill:var(--primary-h)}
+.pop{position:absolute;transform:translate(-50%,calc(-100% - 46px));background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 14px;width:250px;max-width:80%;font-size:.85rem;z-index:2}
+.pop::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--surface);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.pop.below{transform:translate(-50%,14px)}
+.pop.below::after{bottom:auto;top:-7px;transform:translateX(-50%) rotate(225deg)}
+.map-note{position:absolute;left:10px;bottom:8px;font-size:.72rem;color:var(--muted);background:color-mix(in srgb,var(--surface) 85%,transparent);padding:2px 8px;border-radius:4px}
+.map-svg.pick{cursor:crosshair}
+
+/* Perfil alumno / portfolio */
+.prof-head{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.lvl{display:inline-flex;gap:3px}
+.lvl i{width:18px;height:6px;border-radius:3px;background:var(--line)}
+.lvl i.on{background:var(--primary)}
+.tec-rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px 18px}
+.tec-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.proj .img{aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;position:relative;overflow:hidden;background-size:cover;background-position:center}
+.proj .img span{font-family:var(--f-display);font-weight:800;font-size:1.6rem;color:#fff;text-shadow:0 1px 6px rgb(0 0 0 / .25);position:relative;padding:0 12px;text-align:center}
+.proj .img.gen::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgb(255 255 255 / .18) 1px,transparent 1.5px);background-size:14px 14px}
+.proj .b{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.proj .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+
+/* Paneles */
+.panel{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:28px;align-items:start}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 120px);display:flex;flex-direction:column;gap:2px}
+.side .who{display:flex;gap:10px;align-items:center;padding:4px 10px 16px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.side button{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0;background:none;border-radius:var(--r-sm);cursor:pointer;color:var(--muted);font-weight:500;text-align:left;white-space:nowrap}
+.side button:hover{background:var(--surface-2);color:var(--fg)}
+.side button.on{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.side .badge{margin-left:auto;background:var(--accent);color:var(--accent-fg);font-size:.7rem;font-weight:700;border-radius:999px;padding:1px 7px}
+@media (max-width:860px){
+  .panel{grid-template-columns:1fr;gap:16px;padding-top:16px}
+  .side{position:static;flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .side .who{display:none}
+}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px}
+.tile b{font-family:var(--f-display);font-size:1.9rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:.84rem;color:var(--muted)}
+.tile.hl{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+.tile.hl span{color:inherit;opacity:.85}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.li:last-child{border-bottom:0}
+.prog{display:flex;align-items:center;gap:0;margin-top:10px;flex-wrap:wrap}
+.prog .s{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.03em}
+.prog .s i{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);background:var(--surface)}
+.prog .s.done{color:var(--fg)} .prog .s.done i{background:var(--primary);border-color:var(--primary)}
+.prog .s.rej{color:var(--bad)} .prog .s.rej i{background:var(--bad);border-color:var(--bad)}
+.prog .bar{width:28px;height:2px;background:var(--line);margin:0 6px}
+.prog .bar.done{background:var(--primary)}
+.cand{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.fase-ed{display:grid;grid-template-columns:auto minmax(0,1fr) 110px auto;gap:10px;align-items:start;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+@media (max-width:700px){.fase-ed{grid-template-columns:auto minmax(0,1fr)}.fase-ed .fe-d,.fase-ed .fe-a{grid-column:2}}
+.ord{display:flex;flex-direction:column;gap:2px;align-items:center}
+.ord b{font-family:var(--f-mono);font-size:.9rem;color:var(--primary)}
+.ord button{border:0;background:none;cursor:pointer;color:var(--muted);padding:2px;border-radius:4px}
+.ord button:hover:not([disabled]){color:var(--fg);background:var(--surface-2)}
+.ord button[disabled]{opacity:.3;cursor:default}
+.tec-ed{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+.radio-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.radio-cards label{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;background:var(--surface)}
+.radio-cards input{accent-color:var(--primary);margin-top:3px}
+.radio-cards label:has(input:checked){border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.auth{max-width:460px;margin:40px auto;width:100%}
+.demo-acc{display:flex;flex-direction:column;gap:6px}
+.demo-acc button{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.demo-acc button:hover{border-color:var(--primary)}
+
+/* Modal y toast */
+.modal-bg{position:fixed;inset:0;background:rgb(6 18 17 / .55);z-index:80;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--surface);border-radius:14px;width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:22px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 50px rgb(0 0 0 / .3)}
+.modal-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:11px 18px;border-radius:10px;font-weight:600;font-size:.9rem;z-index:90;display:flex;gap:8px;align-items:center;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.toast.bad{background:var(--bad);color:#fff}
+.pdf{background:var(--surface-2);border-radius:var(--r-sm);padding:24px;display:flex;flex-direction:column;gap:8px}
+.pdf .page{background:#fff;color:#1b1b1b;border-radius:4px;padding:22px;box-shadow:var(--shadow);font-size:.82rem;display:flex;flex-direction:column;gap:6px}
+.pdf .page h4{font-family:var(--f-display);font-size:1.1rem;color:#0E5E5B}
+.pdf .bar2{height:6px;background:#e5e5e5;border-radius:3px}
+.foot-site{border-top:1px solid var(--line);background:var(--surface);margin-top:30px}
+.foot-site .wrap{padding-block:22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.84rem;color:var(--muted)}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:30px;justify-content:center}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--primary);animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <button class="logo" data-go="inicio" aria-label="PractiFP, ir al inicio"><span class="logo-mark"><span>P</span></span><span>Practi<b>FP</b></span></button>
+    <nav class="nav" id="nav"></nav>
+    <div class="top-actions" id="topActions"></div>
+    <button class="btn btn-o icon-btn menu-btn" id="menuBtn" aria-label="Abrir menú"></button>
+  </div>
+</header>
+<div class="demo">
+  <div class="wrap">
+    <strong>Prototipo con datos de ejemplo.</strong>
+    <span class="muted">Ver como:</span>
+    <div class="seg" id="roleSeg"></div>
+    <span class="muted">Los cambios se pierden al recargar.</span>
+  </div>
+</div>
+<main id="app"></main>
+<footer class="foot-site"><div class="wrap"><span>PractiFP · Prácticas de Formación Profesional</span><span>Prototipo visual · Mapa simplificado (en la versión final: Leaflet + OpenStreetMap)</span></div></footer>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+/* ---------- Utilidades ---------- */
+const HOY = '2026-11-05';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = d => d ? new Date(d + 'T00:00').toLocaleDateString('es-ES', {day:'numeric', month:'short', year:'numeric'}) : '—';
+const fmtShort = d => new Date(d + 'T00:00').toLocaleDateString('es-ES', {day:'numeric', month:'short'});
+const diasHasta = d => Math.round((new Date(d + 'T00:00') - new Date(HOY + 'T00:00')) / 864e5);
+const nextId = arr => Math.max(0, ...arr.map(x => x.id)) + 1;
+const initials = s => s.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const PALETA = ['#0E5E5B','#B4532A','#2E5AAC','#7A4FA0','#3F7D3A','#A23B5B','#8A6A12','#24707F'];
+
+const IC = {
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  building:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  check:'<path d="m5 12 5 5 9-10"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  logout:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  file:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  code:'<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  euro:'<path d="M17 6.5A6 6 0 0 0 8 12a6 6 0 0 0 9 5.5M5 10h8M5 14h8"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/>',
+  shield:'<path d="M12 3 5 6v5c0 5 3 8.5 7 10 4-1.5 7-5 7-10V6z"/><path d="m9 12 2 2 4-4"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
+  settings:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  up:'<path d="m6 15 6-6 6 6"/>', down:'<path d="m6 9 6 6 6-6"/>', right:'<path d="m9 6 6 6-6 6"/>', left:'<path d="m15 6-6 6 6 6"/>',
+  map:'<path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+  layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  cap:'<path d="m12 4 10 5-10 5L2 9z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  filter:'<path d="M4 5h16l-6 8v6l-4-2v-4z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'
+};
+const ic = (n, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n] || ''}</svg>`;
+
+/* ---------- Datos de ejemplo ---------- */
+const D = {
+  ciclos: [
+    {c:'DAM', n:'Desarrollo de Aplicaciones Multiplataforma'},
+    {c:'DAW', n:'Desarrollo de Aplicaciones Web'},
+    {c:'ASIR', n:'Administración de Sistemas Informáticos en Red'},
+    {c:'SMR', n:'Sistemas Microinformáticos y Redes'}
+  ],
+  tecnologias: ['JavaScript','React','Vue','Node.js','HTML/CSS','PHP','Laravel','Java','Spring Boot','Kotlin','Android','Python','SQL','MariaDB','Git','Docker','Linux','Windows Server','Redes','AWS'],
+  usuarios: [
+    {id:1, email:'admin@practifp.es', rol:'ADMIN', activo:true, alta:'2026-01-10'},
+    {id:2, email:'lucia.martin@correo.example', rol:'ALUMNO', activo:true, alta:'2026-09-14'},
+    {id:3, email:'carlos.ruiz@correo.example', rol:'ALUMNO', activo:true, alta:'2026-09-20'},
+    {id:4, email:'ana.lopez@correo.example', rol:'ALUMNO', activo:true, alta:'2026-10-02'},
+    {id:5, email:'javier.torres@correo.example', rol:'ALUMNO', activo:true, alta:'2026-03-11'},
+    {id:6, email:'marta.gil@correo.example', rol:'ALUMNO', activo:true, alta:'2026-02-20'},
+    {id:7, email:'pablo.sanz@correo.example', rol:'ALUMNO', activo:false, alta:'2026-02-28'},
+    {id:10, email:'rrhh@nubalia.example', rol:'EMPRESA', activo:true, alta:'2026-02-01'},
+    {id:11, email:'talento@sevitec.example', rol:'EMPRESA', activo:true, alta:'2026-02-12'},
+    {id:12, email:'hola@turiaapps.example', rol:'EMPRESA', activo:true, alta:'2026-03-03'},
+    {id:13, email:'empleo@cantabricodata.example', rol:'EMPRESA', activo:true, alta:'2026-10-25'},
+    {id:14, email:'equipo@rambladigital.example', rol:'EMPRESA', activo:true, alta:'2026-04-09'},
+    {id:15, email:'personas@genilcloud.example', rol:'EMPRESA', activo:true, alta:'2026-01-30'},
+    {id:16, email:'info@ebroredes.example', rol:'EMPRESA', activo:true, alta:'2026-10-30'},
+    {id:17, email:'rrhh@atlanticosoft.example', rol:'EMPRESA', activo:true, alta:'2026-05-15'}
+  ],
+  alumnos: [
+    {id:1, usuarioId:2, nombre:'Lucía', apellidos:'Martín Herrera', ciclo:'DAM', curso:'2º', centro:'IES Clara del Rey', localidad:'Madrid', color:PALETA[0],
+     descripcion:'Estudiante de segundo de DAM. Me gusta el desarrollo Android y las aplicaciones que resuelven problemas del día a día. Busco prácticas donde aprender a trabajar en equipo con metodologías ágiles.',
+     cv:'CV_Lucia_Martin.pdf', tecs:[{t:'Kotlin',n:'Avanzado'},{t:'Android',n:'Intermedio'},{t:'Java',n:'Avanzado'},{t:'SQL',n:'Intermedio'},{t:'Git',n:'Intermedio'},{t:'React',n:'Básico'}]},
+    {id:2, usuarioId:3, nombre:'Carlos', apellidos:'Ruiz Moreno', ciclo:'DAW', curso:'2º', centro:'IES Ramón del Valle-Inclán', localidad:'Sevilla', color:PALETA[2],
+     descripcion:'Desarrollador web en formación. Me interesa el frontend y la accesibilidad.', cv:'CV_Carlos_Ruiz.pdf',
+     tecs:[{t:'JavaScript',n:'Avanzado'},{t:'React',n:'Intermedio'},{t:'HTML/CSS',n:'Avanzado'},{t:'PHP',n:'Intermedio'},{t:'Git',n:'Intermedio'}]},
+    {id:3, usuarioId:4, nombre:'Ana', apellidos:'López Ferrer', ciclo:'ASIR', curso:'2º', centro:'IES Abastos', localidad:'Valencia', color:PALETA[4],
+     descripcion:'Apasionada de los sistemas y la nube. Homelab con Proxmox y Docker.', cv:'CV_Ana_Lopez.pdf',
+     tecs:[{t:'Linux',n:'Avanzado'},{t:'Docker',n:'Intermedio'},{t:'Redes',n:'Intermedio'},{t:'AWS',n:'Básico'}]},
+    {id:4, usuarioId:5, nombre:'Javier', apellidos:'Torres Gil', ciclo:'DAW', curso:'2º', centro:'IES Clara del Rey', localidad:'Madrid', color:PALETA[1],
+     descripcion:'Backend con Java y Spring. Terminando el ciclo.', cv:'CV_Javier_Torres.pdf',
+     tecs:[{t:'Java',n:'Avanzado'},{t:'Spring Boot',n:'Intermedio'},{t:'SQL',n:'Avanzado'}]},
+    {id:5, usuarioId:6, nombre:'Marta', apellidos:'Gil Navarro', ciclo:'ASIR', curso:'2º', centro:'IES Hermenegildo Lanz', localidad:'Granada', color:PALETA[3],
+     descripcion:'Administración de sistemas y automatización.', cv:null, tecs:[{t:'Linux',n:'Avanzado'},{t:'AWS',n:'Intermedio'}]},
+    {id:6, usuarioId:7, nombre:'Pablo', apellidos:'Sanz Ortega', ciclo:'ASIR', curso:'2º', centro:'IES Polígono Sur', localidad:'Sevilla', color:PALETA[6],
+     descripcion:'Redes y seguridad.', cv:null, tecs:[{t:'Redes',n:'Avanzado'},{t:'Windows Server',n:'Intermedio'}]}
+  ],
+  empresas: [
+    {id:1, usuarioId:10, nombre:'Nubalia Software', localidad:'Madrid', direccion:'Calle de Alcalá 120', lat:40.4245, lng:-3.6745, verificada:true, web:'https://nubalia.example', telefono:'910 000 120', color:PALETA[0],
+     descripcion:'Consultora de desarrollo de software especializada en aplicaciones móviles y web para el sector logístico. Equipo de 45 personas con tutor asignado para cada alumno en prácticas.'},
+    {id:2, usuarioId:11, nombre:'Sevitec Sistemas', localidad:'Sevilla', direccion:'Avenida de la Buhaira 15', lat:37.3828, lng:-5.9732, verificada:true, web:'https://sevitec.example', telefono:'954 000 015', color:PALETA[2],
+     descripcion:'Servicios gestionados de infraestructura, soporte y redes para pymes andaluzas.'},
+    {id:3, usuarioId:12, nombre:'Turia Apps', localidad:'Valencia', direccion:'Calle de Colón 30', lat:39.4699, lng:-0.3763, verificada:true, web:'https://turiaapps.example', telefono:'963 000 030', color:PALETA[4],
+     descripcion:'Estudio de producto digital. Desarrollamos aplicaciones web y móviles para startups.'},
+    {id:4, usuarioId:13, nombre:'Cantábrico Data', localidad:'Bilbao', direccion:'Gran Vía 40', lat:43.2630, lng:-2.9350, verificada:false, web:'https://cantabricodata.example', telefono:'944 000 040', color:PALETA[7],
+     descripcion:'Análisis de datos e inteligencia de negocio para la industria vasca.'},
+    {id:5, usuarioId:14, nombre:'Rambla Digital', localidad:'Barcelona', direccion:'Carrer de Pallars 100', lat:41.4010, lng:2.1950, verificada:true, web:'https://rambladigital.example', telefono:'930 000 100', color:PALETA[5],
+     descripcion:'Agencia web: comercio electrónico, maquetación y desarrollo a medida en PHP.'},
+    {id:6, usuarioId:15, nombre:'Genil Cloud', localidad:'Granada', direccion:'Calle Recogidas 22', lat:37.1700, lng:-3.6030, verificada:true, web:'https://genilcloud.example', telefono:'958 000 022', color:PALETA[1],
+     descripcion:'Proveedor de servicios cloud y DevOps. Formamos a alumnos de ASIR en automatización e infraestructura como código.'},
+    {id:7, usuarioId:16, nombre:'Ebro Redes', localidad:'Zaragoza', direccion:'Paseo de la Independencia 10', lat:41.6500, lng:-0.8840, verificada:false, web:'https://ebroredes.example', telefono:'976 000 010', color:PALETA[6],
+     descripcion:'Instalación y mantenimiento de redes corporativas y ciberseguridad.'},
+    {id:8, usuarioId:17, nombre:'Atlántico Soft', localidad:'A Coruña', direccion:'Rúa Real 55', lat:43.3700, lng:-8.4000, verificada:true, web:'https://atlanticosoft.example', telefono:'981 000 055', color:PALETA[3],
+     descripcion:'Software de gestión para el sector pesquero y portuario.'}
+  ],
+  ofertas: [
+    {id:1, empresaId:1, titulo:'Desarrollo Android con Kotlin', ciclo:'DAM', localidad:'Madrid', modalidad:'Híbrida', remunerada:true, salario:400, plazas:2, publicada:'2026-10-20', limite:'2026-11-30', activa:true,
+     descripcion:'Te incorporarás al equipo móvil para desarrollar nuevas pantallas de nuestra app de seguimiento de envíos. Trabajarás con Kotlin, Jetpack Compose y una API REST interna.\n\nTendrás un tutor de empresa y revisiones de código semanales.',
+     tecs:[{t:'Kotlin',ob:true},{t:'Android',ob:true},{t:'Git',ob:false},{t:'SQL',ob:false}]},
+    {id:2, empresaId:1, titulo:'Desarrollo frontend con React', ciclo:'DAW', localidad:'Madrid', modalidad:'Presencial', remunerada:true, salario:450, plazas:2, publicada:'2026-10-28', limite:'2026-12-10', activa:true,
+     descripcion:'Colaborarás en el panel web de clientes: componentes reutilizables, formularios y consumo de API REST.',
+     tecs:[{t:'React',ob:true},{t:'JavaScript',ob:true},{t:'HTML/CSS',ob:true},{t:'Git',ob:false}]},
+    {id:3, empresaId:1, titulo:'Backend Java con Spring Boot', ciclo:'DAW', localidad:'Madrid', modalidad:'Remota', remunerada:false, salario:null, plazas:1, publicada:'2026-03-15', limite:'2026-04-15', activa:false,
+     descripcion:'Desarrollo de microservicios internos con Spring Boot y MariaDB.',
+     tecs:[{t:'Java',ob:true},{t:'Spring Boot',ob:true},{t:'MariaDB',ob:false}]},
+    {id:4, empresaId:2, titulo:'Administración de sistemas Linux', ciclo:'ASIR', localidad:'Sevilla', modalidad:'Presencial', remunerada:true, salario:350, plazas:3, publicada:'2026-10-15', limite:'2026-11-20', activa:true,
+     descripcion:'Mantenimiento de servidores Linux de clientes, copias de seguridad, monitorización y automatización con scripts.',
+     tecs:[{t:'Linux',ob:true},{t:'Redes',ob:true},{t:'Docker',ob:false}]},
+    {id:5, empresaId:2, titulo:'Soporte técnico y redes', ciclo:'SMR', localidad:'Sevilla', modalidad:'Presencial', remunerada:false, salario:null, plazas:2, publicada:'2026-10-30', limite:'2026-12-01', activa:true,
+     descripcion:'Atención a incidencias de usuarios, montaje de equipos y configuración de redes locales.',
+     tecs:[{t:'Windows Server',ob:true},{t:'Redes',ob:true}]},
+    {id:6, empresaId:3, titulo:'Desarrollo web full-stack', ciclo:'DAW', localidad:'Valencia', modalidad:'Híbrida', remunerada:true, salario:500, plazas:2, publicada:'2026-11-02', limite:'2026-12-15', activa:true,
+     descripcion:'Desarrollo de funcionalidades completas en un producto SaaS: API en Node.js, base de datos MariaDB y frontend.',
+     tecs:[{t:'JavaScript',ob:true},{t:'Node.js',ob:true},{t:'MariaDB',ob:true},{t:'Vue',ob:false}]},
+    {id:7, empresaId:3, titulo:'Desarrollo de apps móviles', ciclo:'DAM', localidad:'Valencia', modalidad:'Remota', remunerada:true, salario:300, plazas:1, publicada:'2026-10-25', limite:'2026-11-25', activa:true,
+     descripcion:'Apoyo al equipo móvil en el mantenimiento de dos aplicaciones Android publicadas.',
+     tecs:[{t:'Java',ob:true},{t:'Android',ob:true},{t:'Git',ob:true}]},
+    {id:8, empresaId:4, titulo:'Análisis de datos con Python', ciclo:'DAM', localidad:'Bilbao', modalidad:'Híbrida', remunerada:true, salario:420, plazas:1, publicada:'2026-04-01', limite:'2026-05-01', activa:false,
+     descripcion:'Limpieza de datos, consultas SQL y pequeños scripts de automatización en Python.',
+     tecs:[{t:'Python',ob:true},{t:'SQL',ob:true}]},
+    {id:9, empresaId:5, titulo:'Maquetación y desarrollo PHP', ciclo:'DAW', localidad:'Barcelona', modalidad:'Presencial', remunerada:false, salario:null, plazas:2, publicada:'2026-10-10', limite:'2026-11-28', activa:true,
+     descripcion:'Maquetación de tiendas online y desarrollo de módulos a medida.',
+     tecs:[{t:'PHP',ob:true},{t:'HTML/CSS',ob:true},{t:'Laravel',ob:false},{t:'MariaDB',ob:false}]},
+    {id:10, empresaId:6, titulo:'Cloud y DevOps junior', ciclo:'ASIR', localidad:'Granada', modalidad:'Remota', remunerada:true, salario:380, plazas:2, publicada:'2026-10-18', limite:'2026-12-05', activa:true,
+     descripcion:'Despliegues en AWS, contenedores Docker y pipelines de integración continua.',
+     tecs:[{t:'AWS',ob:true},{t:'Docker',ob:true},{t:'Linux',ob:true},{t:'Git',ob:false}]},
+    {id:11, empresaId:7, titulo:'Técnico de redes y ciberseguridad', ciclo:'ASIR', localidad:'Zaragoza', modalidad:'Presencial', remunerada:true, salario:300, plazas:1, publicada:'2026-11-01', limite:'2026-12-20', activa:true,
+     descripcion:'Configuración de cortafuegos, VLAN y auditorías básicas de seguridad.',
+     tecs:[{t:'Redes',ob:true},{t:'Linux',ob:true},{t:'Windows Server',ob:false}]},
+    {id:12, empresaId:8, titulo:'Desarrollo web con Laravel', ciclo:'DAW', localidad:'A Coruña', modalidad:'Híbrida', remunerada:true, salario:400, plazas:2, publicada:'2026-10-22', limite:'2026-11-30', activa:true,
+     descripcion:'Desarrollo de nuevas funcionalidades en nuestro ERP web.',
+     tecs:[{t:'PHP',ob:true},{t:'Laravel',ob:true},{t:'Git',ob:false}]}
+  ],
+  fases: [],
+  candidaturas: [
+    {id:1, alumnoId:1, ofertaId:1, fecha:'2026-10-22', estado:'ENTREVISTA'},
+    {id:2, alumnoId:1, ofertaId:7, fecha:'2026-11-01', estado:'ENVIADA'},
+    {id:3, alumnoId:1, ofertaId:8, fecha:'2026-04-10', estado:'ACEPTADA'},
+    {id:4, alumnoId:1, ofertaId:2, fecha:'2026-10-29', estado:'RECHAZADA'},
+    {id:5, alumnoId:2, ofertaId:2, fecha:'2026-10-30', estado:'REVISADA'},
+    {id:6, alumnoId:2, ofertaId:6, fecha:'2026-11-03', estado:'ENVIADA'},
+    {id:7, alumnoId:2, ofertaId:9, fecha:'2026-03-02', estado:'ACEPTADA'},
+    {id:8, alumnoId:3, ofertaId:4, fecha:'2026-10-18', estado:'ENTREVISTA'},
+    {id:9, alumnoId:3, ofertaId:10, fecha:'2026-10-20', estado:'ACEPTADA'},
+    {id:10, alumnoId:4, ofertaId:2, fecha:'2026-11-02', estado:'ENVIADA'},
+    {id:11, alumnoId:4, ofertaId:3, fecha:'2026-03-20', estado:'ACEPTADA'},
+    {id:12, alumnoId:5, ofertaId:10, fecha:'2026-03-01', estado:'ACEPTADA'},
+    {id:13, alumnoId:6, ofertaId:4, fecha:'2026-03-05', estado:'ACEPTADA'}
+  ],
+  favoritos: [{alumnoId:1, ofertaId:6}, {alumnoId:1, ofertaId:10}],
+  proyectos: [
+    {id:1, alumnoId:1, titulo:'GymTrack', descripcion:'App Android para registrar entrenamientos y ver la evolución con gráficas. Base de datos local con Room.', github:'https://github.com/ejemplo/gymtrack', demo:'', tecs:['Kotlin','Android','SQL'], fecha:'2026-05-20', color:PALETA[0], img:null},
+    {id:2, alumnoId:1, titulo:'Biblioteca IES', descripcion:'Aplicación de escritorio para gestionar los préstamos de la biblioteca del instituto. Proyecto de primer curso.', github:'https://github.com/ejemplo/biblioteca-ies', demo:'', tecs:['Java','MariaDB'], fecha:'2026-02-14', color:PALETA[2], img:null},
+    {id:3, alumnoId:1, titulo:'Portfolio personal', descripcion:'Mi web personal con mis proyectos, hecha con React.', github:'https://github.com/ejemplo/portfolio', demo:'https://ejemplo.github.io/portfolio', tecs:['React','HTML/CSS'], fecha:'2026-09-30', color:PALETA[1], img:null},
+    {id:4, alumnoId:2, titulo:'TapasSevilla', descripcion:'Web de rutas de tapas con mapa y valoraciones.', github:'https://github.com/ejemplo/tapas', demo:'https://ejemplo.github.io/tapas', tecs:['JavaScript','PHP','MariaDB'], fecha:'2026-06-01', color:PALETA[5], img:null},
+    {id:5, alumnoId:3, titulo:'Homelab documentado', descripcion:'Infraestructura doméstica con Proxmox, Docker y copias automáticas.', github:'https://github.com/ejemplo/homelab', demo:'', tecs:['Linux','Docker'], fecha:'2026-07-12', color:PALETA[4], img:null}
+  ],
+  valoraciones: [
+    {id:1, empresaId:5, alumnoId:2, puntuacion:4, comentario:'Buen ambiente y me dejaron participar en proyectos reales desde la primera semana. El horario era algo rígido.', fecha:'2026-06-20', estado:'APROBADA'},
+    {id:2, empresaId:1, alumnoId:4, puntuacion:4, comentario:'Tutor muy implicado y revisiones de código útiles. Aprendí mucho de Spring.', fecha:'2026-06-25', estado:'APROBADA'},
+    {id:3, empresaId:6, alumnoId:5, puntuacion:5, comentario:'Las mejores prácticas posibles para ASIR: Terraform, AWS y un equipo que explica todo con paciencia.', fecha:'2026-06-10', estado:'APROBADA'},
+    {id:4, empresaId:2, alumnoId:6, puntuacion:4, comentario:'Mucho trabajo de campo con clientes. Se aprende rápido.', fecha:'2026-06-15', estado:'APROBADA'},
+    {id:5, empresaId:6, alumnoId:3, puntuacion:5, comentario:'Muy contenta con el equipo, me están enseñando Docker y despliegues reales.', fecha:'2026-11-03', estado:'PENDIENTE'}
+  ]
+};
+// Fases de selección de ejemplo
+(function(){
+  const std = [
+    ['Recepción de candidaturas','Revisamos que el perfil encaje con el ciclo y las tecnologías.',7,true],
+    ['Revisión de currículums','El equipo técnico revisa CV y portfolio.',5,true],
+    ['Prueba técnica','Ejercicio práctico para hacer en casa (2-3 horas).',7,false],
+    ['Entrevista','Entrevista de 30 minutos con el tutor de empresa.',5,true],
+    ['Resolución final','Comunicamos la decisión a todos los candidatos.',3,true]
+  ];
+  let id = 1;
+  [1,2,4,6,10,12].forEach(of => std.forEach((f,i) => D.fases.push({id:id++, ofertaId:of, nombre:f[0], descripcion:f[1], orden:i+1, dias:f[2], obligatoria:f[3]})));
+  [['Recepción de candidaturas','Plazo abierto hasta la fecha límite.',10,true],['Entrevista','Entrevista presencial en nuestra oficina.',4,true],['Resolución final','Respuesta por correo.',2,true]]
+    .forEach((f,i) => D.fases.push({id:id++, ofertaId:5, nombre:f[0], descripcion:f[1], orden:i+1, dias:f[2], obligatoria:f[3]}));
+})();
+const CRED = 'practifp123'; // contraseña de todas las cuentas de ejemplo
+
+/* ---------- Estado ---------- */
+const S = {
+  rol:'VISITANTE', uid:null, view:'inicio', id:null, sec:'dashboard', menu:false, filtrosOpen:false,
+  f:{q:'', ciclo:'', localidad:'', modalidad:'', remunerada:'', empresa:'', tecs:[], activas:true},
+  mapSel:null, mapLoc:'', mapQ:'', candOferta:'', procOferta:null, draftFases:null, editOferta:null, draftTecs:null,
+  adminValTab:'PENDIENTE', adminUserRol:'', adminUserQ:'', errors:{}, loading:false
+};
+
+/* ---------- Consultas ---------- */
+const emp = id => D.empresas.find(e => e.id == id);
+const ofe = id => D.ofertas.find(o => o.id == id);
+const alu = id => D.alumnos.find(a => a.id == id);
+const usr = id => D.usuarios.find(u => u.id == id);
+const fasesDe = id => D.fases.filter(f => f.ofertaId == id).sort((a,b) => a.orden - b.orden);
+const valAprob = eid => D.valoraciones.filter(v => v.empresaId == eid && v.estado === 'APROBADA');
+const media = eid => { const v = valAprob(eid); return v.length ? v.reduce((s,x) => s + x.puntuacion, 0) / v.length : 0; };
+const meAlumno = () => S.rol === 'ALUMNO' ? D.alumnos.find(a => a.usuarioId === S.uid) : null;
+const meEmpresa = () => S.rol === 'EMPRESA' ? D.empresas.find(e => e.usuarioId === S.uid) : null;
+const esFav = oid => { const a = meAlumno(); return a && D.favoritos.some(f => f.alumnoId === a.id && f.ofertaId == oid); };
+const candDe = oid => { const a = meAlumno(); return a && D.candidaturas.find(c => c.alumnoId === a.id && c.ofertaId == oid); };
+const ofertaAbierta = o => o.activa && o.limite >= HOY;
+const puedeValorar = eid => {
+  const a = meAlumno(); if (!a) return false;
+  const aceptada = D.candidaturas.some(c => c.alumnoId === a.id && c.estado === 'ACEPTADA' && ofe(c.ofertaId)?.empresaId == eid);
+  return aceptada && !D.valoraciones.some(v => v.alumnoId === a.id && v.empresaId == eid);
+};
+const localidades = () => [...new Set([...D.ofertas.map(o => o.localidad), ...D.empresas.map(e => e.localidad)])].sort((a,b) => a.localeCompare(b,'es'));
+
+/* ---------- Componentes ---------- */
+const elogo = (e, cls = '') => `<div class="elogo ${cls}" style="background:${e.color}" aria-hidden="true">${esc(initials(e.nombre))}</div>`;
+const elogoSm = (e, px = 30) => `<div class="elogo" style="width:${px}px;height:${px}px;font-size:${px/42}rem;border-radius:7px;background:${e.color}" aria-hidden="true">${esc(initials(e.nombre))}</div>`;
+const avatar = (a, cls = '') => `<div class="avatar ${cls}" style="background:${a.color}" aria-hidden="true">${esc(initials(a.nombre + ' ' + a.apellidos))}</div>`;
+const stars = n => `<span class="stars" aria-label="${n.toFixed(1)} de 5">${[1,2,3,4,5].map(i => `<svg class="ico fill ${i <= Math.round(n) ? '' : 'off'}" viewBox="0 0 24 24">${IC.star}</svg>`).join('')}</span>`;
+const verif = e => e.verificada ? `<span class="verif" title="Empresa verificada por PractiFP">${ic('shield','sm')} Verificada</span>` : `<span class="noverif">${ic('info','sm')} Sin verificar</span>`;
+const st = s => `<span class="st st-${s}">${s}</span>`;
+const lvl = n => { const k = {Básico:1, Intermedio:2, Avanzado:3}[n] || 1; return `<span class="lvl" title="${n}">${[1,2,3].map(i => `<i class="${i <= k ? 'on' : ''}"></i>`).join('')}</span>`; };
+const pago = o => o.remunerada ? `<span class="pay">${o.salario} €/mes</span>` : `<span class="pay no">No remunerada</span>`;
+const plazoTxt = o => {
+  if (!o.activa) return `<span class="st st-INACTIVA">INACTIVA</span>`;
+  const d = diasHasta(o.limite);
+  if (d < 0) return `<span class="muted">Plazo cerrado</span>`;
+  return `<span class="${d <= 7 ? '' : 'muted'}" style="${d <= 7 ? 'color:var(--warn);font-weight:600' : ''}">${ic('clock','sm')} ${d === 0 ? 'Cierra hoy' : `Cierra en ${d} días`}</span>`;
+};
+const projImg = p => p.img
+  ? `<div class="img" style="background-image:url('${p.img}')"></div>`
+  : `<div class="img gen" style="background:linear-gradient(135deg, ${p.color}, color-mix(in srgb, ${p.color} 55%, #000))"><span>${esc(p.titulo)}</span></div>`;
+
+function ofertaCard(o){
+  const e = emp(o.empresaId);
+  const favBtn = S.rol === 'ALUMNO' ? `<button class="fav ${esFav(o.id) ? 'on' : ''}" data-act="fav" data-id="${o.id}" aria-label="${esFav(o.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'}">${ic('heart', esFav(o.id) ? 'fill' : '')}</button>` : '';
+  const c = candDe(o.id);
+  return `<article class="ocard" data-go="oferta" data-id="${o.id}" tabindex="0">
+    <div class="row" style="align-items:flex-start;flex-wrap:nowrap">
+      ${elogo(e)}
+      <div class="grow"><div class="t">${esc(o.titulo)}</div>
+        <div class="emp">${esc(e.nombre)} ${e.verificada ? `<span class="verif">${ic('shield','sm')}</span>` : ''}</div></div>
+      ${favBtn}
+    </div>
+    <div class="meta"><span class="chip ciclo">${o.ciclo}</span><span>${ic('pin','sm')} ${esc(o.localidad)}</span><span>${ic('briefcase','sm')} ${o.modalidad}</span><span>${ic('users','sm')} ${o.plazas} ${o.plazas === 1 ? 'plaza' : 'plazas'}</span></div>
+    <div class="chips">${o.tecs.slice(0,4).map(t => `<span class="chip ${t.ob ? 'tec' : 'opt'}">${esc(t.t)}</span>`).join('')}</div>
+    <div class="foot">${pago(o)} ${c ? st(c.estado) : plazoTxt(o)}</div>
+  </article>`;
+}
+
+/* ---------- Mapa (SVG simplificado de la península) ---------- */
+const MAP = {w:660, h:500, lng0:-9.6, lng1:4.5, lat0:35.8, lat1:44.0};
+const proj = (lat, lng) => [ (lng - MAP.lng0) / (MAP.lng1 - MAP.lng0) * MAP.w, (MAP.lat1 - lat) / (MAP.lat1 - MAP.lat0) * MAP.h ];
+const unproj = (x, y) => [ MAP.lat1 - y / MAP.h * (MAP.lat1 - MAP.lat0), MAP.lng0 + x / MAP.w * (MAP.lng1 - MAP.lng0) ];
+const PENINSULA = [[-9.3,43.0],[-8.2,43.7],[-7.0,43.55],[-5.8,43.6],[-4.5,43.4],[-3.5,43.45],[-1.8,43.4],[-1.4,43.05],[0,42.7],[1.4,42.6],[3.2,42.4],[3.2,41.9],[2.1,41.3],[0.9,41.0],[0.2,40.2],[-0.3,39.5],[0.2,38.8],[-0.5,38.3],[-0.8,37.6],[-1.6,37.3],[-2.1,36.7],[-3.4,36.7],[-4.4,36.7],[-5.3,36.1],[-6.0,36.4],[-6.4,36.9],[-7.4,37.2],[-7.5,37.6],[-7.0,38.0],[-7.3,38.6],[-7.0,39.0],[-7.5,39.6],[-6.9,40.2],[-6.8,41.0],[-6.2,41.6],[-6.6,41.9],[-8.1,41.8],[-8.9,42.1]];
+const PORTUGAL = [[-8.9,42.1],[-8.1,41.8],[-6.6,41.9],[-6.2,41.6],[-6.8,41.0],[-6.9,40.2],[-7.5,39.6],[-7.0,39.0],[-7.3,38.6],[-7.0,38.0],[-7.5,37.6],[-7.4,37.2],[-8.9,37.0],[-8.8,38.7],[-9.5,38.8],[-8.9,40.5],[-8.7,41.5]];
+const MALLORCA = [[2.35,39.6],[3.1,39.95],[3.48,39.7],[3.25,39.3],[2.7,39.45]];
+const poly = pts => pts.map(([lng,lat]) => proj(lat,lng).map(v => v.toFixed(1)).join(',')).join(' ');
+function mapSVG({ empresas, sel = null, dimLoc = '', pick = false, single = null }){
+  const grat = [];
+  for (let lng = -9; lng <= 4; lng++) { const [x] = proj(0, lng); grat.push(`<line class="grat" x1="${x}" y1="0" x2="${x}" y2="${MAP.h}"/>`); }
+  for (let lat = 36; lat <= 43; lat++) { const [,y] = proj(lat, 0); grat.push(`<line class="grat" x1="0" y1="${y}" x2="${MAP.w}" y2="${y}"/>`); }
+  const marks = empresas.map(e => {
+    const [x,y] = proj(e.lat, e.lng);
+    const on = sel == e.id || single;
+    const dim = dimLoc && e.localidad !== dimLoc;
+    return `<g class="mk ${on ? 'on' : ''} ${dim ? 'dim' : ''}" ${single || pick ? '' : `data-act="mapSel" data-id="${e.id}" tabindex="0" role="button" aria-label="${esc(e.nombre)}"`} transform="translate(${x.toFixed(1)},${y.toFixed(1)})">
+      <path class="pinb" d="M0 0c-2-6-11-11-11-19a11 11 0 0 1 22 0c0 8-9 13-11 19z"/><circle class="dot" cy="-19" r="4"/></g>`;
+  }).join('');
+  return `<svg class="map-svg ${pick ? 'pick' : ''}" viewBox="0 0 ${MAP.w} ${MAP.h}" ${pick ? 'data-pick="1"' : ''} role="img" aria-label="Mapa de empresas">
+    <rect class="sea" width="${MAP.w}" height="${MAP.h}"/>${grat.join('')}
+    <polygon points="${poly(PORTUGAL)}" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+    <polygon class="land" points="${poly(PENINSULA)}"/><polygon class="land" points="${poly(MALLORCA)}"/>
+    ${marks}</svg>`;
+}
+
+/* ---------- Vistas públicas ---------- */
+function vInicio(){
+  const recientes = D.ofertas.filter(ofertaAbierta).sort((a,b) => b.publicada.localeCompare(a.publicada)).slice(0,6);
+  const nEmp = D.empresas.length, nOf = D.ofertas.filter(ofertaAbierta).length;
+  const plazas = D.ofertas.filter(ofertaAbierta).reduce((s,o) => s + o.plazas, 0);
+  return `<section class="hero"><div class="wrap">
+    <div>
+      <div class="eyebrow">Prácticas para ciclos formativos</div>
+      <h1 style="margin-top:10px">Tus prácticas de FP, <em>sin dar vueltas</em>.</h1>
+      <p class="hero-lead">Ofertas de empresas reales para DAM, DAW, ASIR y más. Consulta el proceso de selección antes de inscribirte, lee lo que opinan otros alumnos y sigue tus candidaturas en un solo sitio.</p>
+      <form class="searchbar" data-form="heroSearch">
+        <input class="inp" id="hq" name="q" placeholder="Puesto, tecnología o empresa" aria-label="Buscar">
+        <select class="inp" id="hloc" name="localidad" aria-label="Localidad"><option value="">Toda España</option>${localidades().map(l => `<option>${esc(l)}</option>`).join('')}</select>
+        <button class="btn btn-p" type="submit">${ic('search')} Buscar</button>
+      </form>
+      <div class="ciclos-row"><span class="muted" style="font-size:.85rem">Por ciclo:</span>
+        ${D.ciclos.map(c => `<button class="ciclo-tile" data-act="byCiclo" data-id="${c.c}"><span class="chip ciclo">${c.c}</span>${D.ofertas.filter(o => o.ciclo === c.c && ofertaAbierta(o)).length} ofertas</button>`).join('')}
+      </div>
+    </div>
+    <div class="ticket" aria-hidden="true">
+      <div class="eyebrow">Así se ve una candidatura</div>
+      <div class="tk">${elogo(emp(1))}<div class="grow"><b>Desarrollo Android con Kotlin</b><div class="muted" style="font-size:.84rem">Nubalia Software · Madrid</div></div>${st('ENTREVISTA')}</div>
+      <div class="tk">${elogo(emp(3))}<div class="grow"><b>Desarrollo web full-stack</b><div class="muted" style="font-size:.84rem">Turia Apps · Valencia</div></div>${st('REVISADA')}</div>
+      <div class="tk">${elogo(emp(6))}<div class="grow"><b>Cloud y DevOps junior</b><div class="muted" style="font-size:.84rem">Genil Cloud · Granada</div></div>${st('ACEPTADA')}</div>
+      <div class="row muted" style="font-size:.84rem">${ic('info','sm')} ${nOf} ofertas abiertas · ${plazas} plazas · ${nEmp} empresas</div>
+    </div>
+  </div></section>
+  <section class="section"><div class="wrap">
+    <div class="sec-h"><div><div class="eyebrow">Recién publicadas</div><h2 style="margin-top:4px">Ofertas abiertas</h2></div>
+      <button class="btn btn-o" data-go="ofertas">Ver todas ${ic('right','sm')}</button></div>
+    <div class="ocards">${recientes.map(ofertaCard).join('')}</div>
+  </div></section>
+  <section class="section" style="padding-top:0"><div class="wrap">
+    <div class="sec-h"><div><div class="eyebrow">Cómo funciona</div><h2 style="margin-top:4px">Del perfil a la empresa en tres pasos</h2></div></div>
+    <div class="how">
+      <div class="card"><span class="num">PASO 1</span><h3>Crea tu perfil</h3><p class="muted">Ciclo, centro, tecnologías con tu nivel, currículum en PDF y un portfolio con tus proyectos.</p></div>
+      <div class="card"><span class="num">PASO 2</span><h3>Elige con información</h3><p class="muted">Filtra por ciclo, modalidad o tecnología, revisa las fases del proceso y las valoraciones de otros alumnos.</p></div>
+      <div class="card"><span class="num">PASO 3</span><h3>Sigue tu candidatura</h3><p class="muted">Ve en qué estado está cada inscripción: enviada, revisada, entrevista, aceptada o rechazada.</p></div>
+    </div>
+    <div class="row" style="margin-top:22px">
+      ${S.rol === 'VISITANTE' ? `<button class="btn btn-p" data-go="registro">Crear cuenta gratis</button><button class="btn btn-o" data-go="registro" data-tipo="EMPRESA">Soy una empresa</button>` : ''}
+      <button class="btn btn-g" data-go="empresas">${ic('map')} Ver empresas en el mapa</button>
+    </div>
+  </div></section>`;
+}
+
+function filtrar(){
+  const f = S.f;
+  return D.ofertas.filter(o => {
+    const e = emp(o.empresaId);
+    if (f.activas && !ofertaAbierta(o)) return false;
+    if (f.q && !(o.titulo + ' ' + o.descripcion + ' ' + e.nombre + ' ' + o.tecs.map(t => t.t).join(' ')).toLowerCase().includes(f.q.toLowerCase())) return false;
+    if (f.ciclo && o.ciclo !== f.ciclo) return false;
+    if (f.localidad && o.localidad !== f.localidad) return false;
+    if (f.modalidad && o.modalidad !== f.modalidad) return false;
+    if (f.remunerada && (f.remunerada === 'si') !== o.remunerada) return false;
+    if (f.empresa && o.empresaId != f.empresa) return false;
+    if (f.tecs.length && !f.tecs.every(t => o.tecs.some(x => x.t === t))) return false;
+    return true;
+  }).sort((a,b) => b.publicada.localeCompare(a.publicada));
+}
+function vOfertas(){
+  const f = S.f;
+  const sel = (id, label, opts, val) => `<div class="field"><label for="${id}">${label}</label><select class="inp" id="${id}" data-filter="${id.slice(2)}"><option value="">Todos</option>${opts.map(o => `<option value="${esc(o[0])}" ${String(val) === String(o[0]) ? 'selected' : ''}>${esc(o[1])}</option>`).join('')}</select></div>`;
+  return `<div class="wrap search-layout">
+    <aside class="filters ${S.filtrosOpen ? 'open' : ''}" aria-label="Filtros">
+      <div class="card">
+        <div class="row between"><h3>Filtros</h3><button class="btn btn-g btn-sm" data-act="clearF">Limpiar</button></div>
+        <div class="field"><label for="f-q">Buscar</label><input class="inp" id="f-q" data-filter="q" value="${esc(f.q)}" placeholder="Puesto, empresa…"></div>
+        ${sel('f-ciclo','Ciclo formativo', D.ciclos.map(c => [c.c, c.c + ' · ' + c.n]), f.ciclo)}
+        ${sel('f-localidad','Localidad', localidades().map(l => [l,l]), f.localidad)}
+        ${sel('f-modalidad','Modalidad', [['Presencial','Presencial'],['Híbrida','Híbrida'],['Remota','Remota']], f.modalidad)}
+        ${sel('f-remunerada','Remuneración', [['si','Remuneradas'],['no','No remuneradas']], f.remunerada)}
+        ${sel('f-empresa','Empresa', D.empresas.map(e => [e.id, e.nombre]), f.empresa)}
+        <div class="field"><span class="lbl">Tecnologías requeridas</span>
+          <div class="tec-pick">${D.tecnologias.map(t => `<button type="button" class="${f.tecs.includes(t) ? 'on' : ''}" data-act="tecF" data-id="${esc(t)}" aria-pressed="${f.tecs.includes(t)}">${esc(t)}</button>`).join('')}</div></div>
+        <label class="check"><input type="checkbox" id="f-activas" data-filter="activas" ${f.activas ? 'checked' : ''}> Solo ofertas activas y en plazo</label>
+      </div>
+    </aside>
+    <section class="stack" style="min-width:0">
+      <div class="row between"><div><h1>Buscar ofertas</h1></div>
+        <button class="btn btn-o filters-toggle" data-act="toggleF">${ic('filter')} Filtros</button></div>
+      <div id="resultados"></div>
+    </section>
+  </div>`;
+}
+function renderResultados(){
+  const box = $('#resultados'); if (!box) return;
+  const r = filtrar(), f = S.f;
+  const act = [];
+  if (f.q) act.push(['q', `“${f.q}”`]);
+  ['ciclo','localidad','modalidad'].forEach(k => f[k] && act.push([k, f[k]]));
+  if (f.remunerada) act.push(['remunerada', f.remunerada === 'si' ? 'Remuneradas' : 'No remuneradas']);
+  if (f.empresa) act.push(['empresa', emp(f.empresa).nombre]);
+  f.tecs.forEach(t => act.push(['tec:' + t, t]));
+  box.innerHTML = `<div class="row between" style="margin-bottom:12px">
+      <span class="muted"><b style="color:var(--fg)">${r.length}</b> ${r.length === 1 ? 'oferta encontrada' : 'ofertas encontradas'}</span>
+      <div class="active-f">${act.map(([k,l]) => `<button data-act="rmF" data-id="${esc(k)}" aria-label="Quitar filtro ${esc(l)}">${esc(l)} ${ic('x','sm')}</button>`).join('')}</div></div>
+    ${r.length ? `<div class="ocards">${r.map(ofertaCard).join('')}</div>` : `<div class="empty"><b>No hay ofertas con estos filtros.</b><br>Prueba a quitar alguna tecnología o a desmarcar “Solo ofertas activas”.<div style="margin-top:12px"><button class="btn btn-o btn-sm" data-act="clearF">Limpiar filtros</button></div></div>`}`;
+}
+
+function procesoHTML(fs){
+  if (!fs.length) return `<div class="empty">La empresa todavía no ha publicado las fases de este proceso.</div>`;
+  const min = fs.filter(f => f.obligatoria).reduce((s,f) => s + f.dias, 0), max = fs.reduce((s,f) => s + f.dias, 0);
+  return `<div class="timeline">${fs.map(f => `<div class="tl-step ${f.obligatoria ? '' : 'opt'}">
+      <div class="tl-num">${f.orden}</div>
+      <div><b>${esc(f.nombre)}</b> ${f.obligatoria ? '' : '<span class="chip opt" style="margin-left:4px">Opcional</span>'}<p class="muted" style="font-size:.9rem">${esc(f.descripcion)}</p></div>
+      <div class="tl-days">~${f.dias} ${f.dias === 1 ? 'día' : 'días'}</div></div>`).join('')}</div>
+    <div class="notice">${ic('clock')}<span>Duración estimada del proceso: <b>${min === max ? max : `${min}–${max}`} días</b>${min !== max ? ' (según se apliquen las fases opcionales)' : ''}.</span></div>`;
+}
+
+function vOferta(){
+  const o = ofe(S.id); if (!o) return vNoEncontrado();
+  const e = emp(o.empresaId), c = candDe(o.id), fs = fasesDe(o.id);
+  const obl = o.tecs.filter(t => t.ob), des = o.tecs.filter(t => !t.ob);
+  let accion;
+  if (S.rol === 'ALUMNO') {
+    if (c) accion = `<div class="stack" style="gap:8px"><span class="muted">Te inscribiste el ${fmt(c.fecha)}</span><div>${st(c.estado)}</div><button class="btn btn-o" data-go="panel" data-sec="candidaturas">Ver mis candidaturas</button></div>`;
+    else if (!ofertaAbierta(o)) accion = `<div class="notice">${ic('info')}<span>Esta oferta no admite inscripciones${o.activa ? ': el plazo terminó el ' + fmt(o.limite) : ' porque está inactiva'}.</span></div>`;
+    else accion = `<button class="btn btn-p" style="width:100%" data-act="inscribir" data-id="${o.id}">Inscribirme en la oferta</button>`;
+    accion += `<button class="btn btn-o" style="width:100%" data-act="fav" data-id="${o.id}">${ic('heart', esFav(o.id) ? 'fill' : '')} ${esFav(o.id) ? 'Guardada en favoritos' : 'Guardar en favoritos'}</button>`;
+  } else if (S.rol === 'VISITANTE') {
+    accion = `<button class="btn btn-p" style="width:100%" data-go="login">Inicia sesión para inscribirte</button><button class="btn btn-o" style="width:100%" data-go="registro">Crear cuenta de alumno</button>`;
+  } else if (S.rol === 'EMPRESA' && meEmpresa()?.id === e.id) {
+    accion = `<button class="btn btn-p" style="width:100%" data-act="editOferta" data-id="${o.id}">${ic('edit')} Editar oferta</button><button class="btn btn-o" style="width:100%" data-act="verCandidatos" data-id="${o.id}">${ic('users')} Ver candidatos</button>`;
+  } else {
+    accion = `<div class="notice">${ic('info')}<span>Solo las cuentas de alumno pueden inscribirse.</span></div>`;
+  }
+  const m = media(e.id), nv = valAprob(e.id).length;
+  return `<div class="wrap"><button class="back" data-act="back">${ic('left','sm')} Volver</button></div>
+  <div class="wrap detail">
+    <div class="stack" style="gap:22px">
+      <div class="card stack">
+        <div class="row" style="align-items:flex-start;flex-wrap:nowrap">${elogo(e,'lg')}
+          <div class="grow stack" style="gap:6px"><h1>${esc(o.titulo)}</h1>
+            <div class="row" style="gap:8px"><button class="linkish" data-go="empresa" data-id="${e.id}">${esc(e.nombre)}</button>${verif(e)}</div></div></div>
+        <div class="facts">
+          <div><span class="eyebrow">Ciclo</span><b><span class="chip ciclo">${o.ciclo}</span></b></div>
+          <div><span class="eyebrow">Localidad</span><b>${esc(o.localidad)}</b></div>
+          <div><span class="eyebrow">Modalidad</span><b>${o.modalidad}</b></div>
+          <div><span class="eyebrow">Remuneración</span><b>${o.remunerada ? o.salario + ' €/mes' : 'No remunerada'}</b></div>
+          <div><span class="eyebrow">Plazas</span><b>${o.plazas}</b></div>
+          <div><span class="eyebrow">Publicada</span><b>${fmt(o.publicada)}</b></div>
+          <div><span class="eyebrow">Inscripción hasta</span><b>${fmt(o.limite)}</b></div>
+          <div><span class="eyebrow">Estado</span><b>${ofertaAbierta(o) ? '<span class="st st-ACTIVA">ABIERTA</span>' : o.activa ? '<span class="st st-PENDIENTE">PLAZO CERRADO</span>' : '<span class="st st-INACTIVA">INACTIVA</span>'}</b></div>
+        </div>
+      </div>
+      <div class="card stack"><h2>Descripción</h2><div class="prose">${o.descripcion.split('\n\n').map(p => `<p>${esc(p)}</p>`).join('')}</div></div>
+      <div class="card stack"><h2>Tecnologías</h2>
+        <div><div class="eyebrow" style="margin-bottom:6px">Obligatorias</div><div class="chips">${obl.map(t => `<span class="chip tec">${ic('check','sm')} ${esc(t.t)}</span>`).join('') || '<span class="muted">Ninguna</span>'}</div></div>
+        ${des.length ? `<div><div class="eyebrow" style="margin-bottom:6px">Se valoran</div><div class="chips">${des.map(t => `<span class="chip opt">${esc(t.t)}</span>`).join('')}</div></div>` : ''}
+      </div>
+      <div class="card stack"><div><h2>Proceso de selección</h2><p class="muted" style="margin-top:4px">Fases previstas por la empresa antes de que te inscribas.</p></div>${procesoHTML(fs)}</div>
+    </div>
+    <aside class="sticky-side">
+      <div class="card apply-card stack" style="gap:10px">${S.rol === 'ALUMNO' && !c ? `<div class="row between"><b style="font-size:1.1rem">${o.remunerada ? o.salario + ' €/mes' : 'No remunerada'}</b>${plazoTxt(o)}</div>` : ''}${accion}</div>
+      <div class="card stack" style="gap:10px">
+        <div class="row" style="flex-wrap:nowrap">${elogo(e)}<div class="grow"><b>${esc(e.nombre)}</b><div>${nv ? `${stars(m)} <span class="muted" style="font-size:.84rem">${m.toFixed(1)} · ${nv} ${nv === 1 ? 'valoración' : 'valoraciones'}</span>` : '<span class="muted" style="font-size:.84rem">Sin valoraciones todavía</span>'}</div></div></div>
+        <div class="meta" style="flex-direction:column;gap:6px"><span>${ic('pin','sm')} ${esc(e.direccion)}, ${esc(e.localidad)}</span><span>${ic('globe','sm')} ${esc(e.web.replace('https://',''))}</span></div>
+        <button class="btn btn-o" data-go="empresa" data-id="${e.id}">Ver ficha de la empresa</button>
+      </div>
+    </aside>
+  </div>`;
+}
+
+function vEmpresas(){
+  const q = S.mapQ.toLowerCase();
+  const list = D.empresas.filter(e => (!S.mapLoc || e.localidad === S.mapLoc) && (!q || e.nombre.toLowerCase().includes(q)));
+  const sel = emp(S.mapSel);
+  let pop = '';
+  if (sel) {
+    const [x,y] = proj(sel.lat, sel.lng);
+    const nOf = D.ofertas.filter(o => o.empresaId === sel.id && ofertaAbierta(o)).length;
+    const below = y / MAP.h < 0.4;
+    pop = `<div class="pop ${below ? 'below' : ''}" style="left:clamp(130px, ${(x / MAP.w * 100).toFixed(2)}%, calc(100% - 130px));top:${(y / MAP.h * 100).toFixed(2)}%">
+      <div class="row between" style="flex-wrap:nowrap"><b>${esc(sel.nombre)}</b><button class="btn btn-g btn-sm icon-btn" style="width:26px;height:26px" data-act="mapSel" data-id="" aria-label="Cerrar">${ic('x','sm')}</button></div>
+      <div class="muted" style="margin:4px 0 10px">${esc(sel.direccion)}, ${esc(sel.localidad)}</div>
+      <div class="row"><button class="btn btn-p btn-sm" data-go="empresa" data-id="${sel.id}">Ver ficha</button><button class="btn btn-o btn-sm" data-act="ofertasEmpresa" data-id="${sel.id}">${nOf} ${nOf === 1 ? 'oferta' : 'ofertas'}</button></div></div>`;
+  }
+  return `<div class="wrap" style="padding-top:28px"><h1>Empresas</h1><p class="muted" style="margin-top:6px">Encuentra empresas cerca de ti y consulta sus ofertas de prácticas.</p></div>
+  <div class="wrap map-layout">
+    <div class="stack" style="gap:12px">
+      <div class="grid2" style="gap:8px">
+        <div class="field"><label for="m-q">Nombre</label><input class="inp" id="m-q" data-mapf="q" value="${esc(S.mapQ)}" placeholder="Buscar empresa"></div>
+        <div class="field"><label for="m-loc">Localidad</label><select class="inp" id="m-loc" data-mapf="loc"><option value="">Todas</option>${[...new Set(D.empresas.map(e => e.localidad))].sort().map(l => `<option ${S.mapLoc === l ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
+      </div>
+      <div class="elist">${list.length ? list.map(e => {
+        const m = media(e.id), nOf = D.ofertas.filter(o => o.empresaId === e.id && ofertaAbierta(o)).length;
+        return `<button class="eitem ${S.mapSel == e.id ? 'on' : ''}" data-act="mapSel" data-id="${e.id}">${elogo(e)}
+          <div class="grow"><b>${esc(e.nombre)}</b><div class="muted" style="font-size:.82rem">${ic('pin','sm')} ${esc(e.localidad)} · ${nOf} ${nOf === 1 ? 'oferta' : 'ofertas'}</div>
+          <div class="row" style="gap:6px;margin-top:2px">${m ? `${stars(m)}<span class="muted" style="font-size:.78rem">${m.toFixed(1)}</span>` : ''}${verif(e)}</div></div></button>`; }).join('') : '<div class="empty">No hay empresas que coincidan.</div>'}</div>
+    </div>
+    <div class="map-box">${mapSVG({empresas: D.empresas, sel: S.mapSel, dimLoc: S.mapLoc})}${pop}<span class="map-note">Vista simplificada · versión final con Leaflet + OpenStreetMap</span></div>
+  </div>`;
+}
+
+function vEmpresa(){
+  const e = emp(S.id); if (!e) return vNoEncontrado();
+  const ofs = D.ofertas.filter(o => o.empresaId === e.id && (ofertaAbierta(o) || meEmpresa()?.id === e.id));
+  const vals = valAprob(e.id), m = media(e.id);
+  const dist = [5,4,3,2,1].map(n => [n, vals.filter(v => v.puntuacion === n).length]);
+  let valorar = '';
+  if (S.rol === 'ALUMNO') {
+    const a = meAlumno(), ya = D.valoraciones.find(v => v.alumnoId === a.id && v.empresaId === e.id);
+    valorar = ya ? `<div class="notice">${ic('check')}<span>Ya valoraste esta empresa. Estado: ${st(ya.estado)}</span></div>`
+      : puedeValorar(e.id) ? `<button class="btn btn-a" data-act="valorar" data-id="${e.id}">${ic('star')} Valorar empresa</button>`
+      : `<div class="notice">${ic('lock')}<span>Solo pueden valorar los alumnos con una candidatura aceptada en esta empresa.</span></div>`;
+  }
+  return `<div class="wrap"><button class="back" data-act="back">${ic('left','sm')} Volver</button></div>
+  <div class="wrap detail">
+    <div class="stack" style="gap:22px">
+      <div class="card stack">
+        <div class="prof-head">${elogo(e,'lg')}<div class="grow stack" style="gap:6px"><h1>${esc(e.nombre)}</h1>
+          <div class="row">${verif(e)}${vals.length ? `${stars(m)}<span class="muted">${m.toFixed(1)} de 5 · ${vals.length} ${vals.length === 1 ? 'valoración' : 'valoraciones'}</span>` : '<span class="muted">Sin valoraciones</span>'}</div></div></div>
+        <p class="prose">${esc(e.descripcion)}</p>
+      </div>
+      <div class="stack"><div class="row between"><h2>Ofertas de prácticas</h2><span class="muted">${ofs.length} ${ofs.length === 1 ? 'oferta' : 'ofertas'}</span></div>
+        ${ofs.length ? `<div class="ocards">${ofs.map(ofertaCard).join('')}</div>` : '<div class="empty">Esta empresa no tiene ofertas abiertas ahora mismo.</div>'}</div>
+      <div class="card stack"><div class="row between"><h2>Valoraciones de alumnos</h2>${valorar}</div>
+        ${vals.length ? `<div class="row" style="gap:28px;align-items:center"><div style="text-align:center"><div style="font-family:var(--f-display);font-size:2.6rem;font-weight:800;line-height:1">${m.toFixed(1)}</div>${stars(m)}</div>
+          <div class="stack grow" style="gap:4px;max-width:320px">${dist.map(([n,c]) => `<div class="row" style="gap:8px;flex-wrap:nowrap;font-size:.8rem"><span class="mono" style="width:10px">${n}</span><div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px"><div style="width:${vals.length ? c / vals.length * 100 : 0}%;height:100%;background:var(--accent);border-radius:3px"></div></div><span class="muted mono" style="width:14px">${c}</span></div>`).join('')}</div></div>
+          <div class="list">${vals.map(v => { const a = alu(v.alumnoId); return `<div class="li" style="align-items:flex-start">${avatar(a,'sm')}<div class="grow"><div class="row between"><b>${esc(a.nombre)} ${esc(a.apellidos[0])}.</b><span class="muted" style="font-size:.8rem">${fmt(v.fecha)}</span></div><div class="row" style="gap:6px">${stars(v.puntuacion)}<span class="chip ciclo">${a.ciclo}</span></div><p style="margin-top:6px">${esc(v.comentario)}</p></div></div>`; }).join('')}</div>`
+          : '<div class="empty">Todavía no hay valoraciones publicadas.</div>'}
+      </div>
+    </div>
+    <aside class="sticky-side">
+      <div class="card stack" style="gap:12px"><h3>Contacto y ubicación</h3>
+        <div class="meta" style="flex-direction:column;gap:8px;font-size:.9rem">
+          <span>${ic('pin','sm')} ${esc(e.direccion)}, ${esc(e.localidad)}</span>
+          <span>${ic('globe','sm')} <a href="${esc(e.web)}" target="_blank" rel="noopener">${esc(e.web.replace('https://',''))}</a></span>
+          <span>${ic('phone','sm')} <span style="user-select:all">${esc(e.telefono)}</span></span>
+          <span class="mono">${e.lat.toFixed(4)}, ${e.lng.toFixed(4)}</span></div>
+        <div class="map-box">${mapSVG({empresas:[e], single:true})}</div>
+        <button class="btn btn-o" data-act="verEnMapa" data-id="${e.id}">${ic('map')} Ver en el mapa de empresas</button>
+      </div>
+    </aside>
+  </div>`;
+}
+
+function puedeVerCV(a){
+  if (S.rol === 'ADMIN') return true;
+  if (S.rol === 'ALUMNO') return meAlumno()?.id === a.id;
+  if (S.rol === 'EMPRESA') { const e = meEmpresa(); return D.candidaturas.some(c => c.alumnoId === a.id && ofe(c.ofertaId)?.empresaId === e.id); }
+  return false;
+}
+function vAlumno(){
+  const a = alu(S.id); if (!a) return vNoEncontrado();
+  const ps = D.proyectos.filter(p => p.alumnoId === a.id).sort((x,y) => y.fecha.localeCompare(x.fecha));
+  const ciclo = D.ciclos.find(c => c.c === a.ciclo);
+  const cv = !a.cv ? '<span class="muted">Sin currículum subido</span>'
+    : puedeVerCV(a) ? `<button class="btn btn-o" data-act="verCV" data-id="${a.id}">${ic('file')} Ver currículum (PDF)</button>`
+    : `<div class="notice">${ic('lock')}<span>El currículum solo lo pueden ver las empresas en cuyas ofertas se ha inscrito.</span></div>`;
+  return `<div class="wrap"><button class="back" data-act="back">${ic('left','sm')} Volver</button></div>
+  <div class="wrap stack" style="padding-block:24px;gap:22px">
+    <div class="card stack">
+      <div class="prof-head">${avatar(a,'lg')}<div class="grow stack" style="gap:6px"><h1>${esc(a.nombre)} ${esc(a.apellidos)}</h1>
+        <div class="row" style="gap:8px"><span class="chip ciclo">${a.ciclo}</span><span>${a.curso} curso · ${esc(ciclo?.n || a.ciclo)}</span></div>
+        <div class="meta"><span>${ic('cap','sm')} ${esc(a.centro)}</span><span>${ic('pin','sm')} ${esc(a.localidad)}</span></div></div>
+        ${meAlumno()?.id === a.id ? `<button class="btn btn-o" data-go="panel" data-sec="perfil">${ic('edit')} Editar perfil</button>` : ''}</div>
+      <p class="prose">${esc(a.descripcion)}</p><div>${cv}</div>
+    </div>
+    <div class="card stack"><h2>Tecnologías</h2>
+      ${a.tecs.length ? `<div class="tec-rows">${a.tecs.map(t => `<div class="tec-row"><span>${esc(t.t)}</span><span class="row" style="gap:8px"><span class="muted" style="font-size:.8rem">${t.n}</span>${lvl(t.n)}</span></div>`).join('')}</div>` : '<div class="empty">Sin tecnologías añadidas.</div>'}</div>
+    <div class="stack"><h2>Portfolio</h2>
+      ${ps.length ? `<div class="pgrid">${ps.map(p => projCard(p, false)).join('')}</div>` : '<div class="empty">Este alumno todavía no ha añadido proyectos.</div>'}</div>
+  </div>`;
+}
+function projCard(p, editable){
+  return `<article class="proj">${projImg(p)}<div class="b">
+    <div class="row between"><h3>${esc(p.titulo)}</h3><span class="muted" style="font-size:.78rem">${fmt(p.fecha)}</span></div>
+    <p class="muted" style="font-size:.9rem">${esc(p.descripcion)}</p>
+    <div class="chips">${p.tecs.map(t => `<span class="chip tec">${esc(t)}</span>`).join('')}</div>
+    <div class="links">
+      ${p.github ? `<a class="btn btn-o btn-sm" href="${esc(p.github)}" target="_blank" rel="noopener">${ic('code','sm')} GitHub</a>` : ''}
+      ${p.demo ? `<a class="btn btn-o btn-sm" href="${esc(p.demo)}" target="_blank" rel="noopener">${ic('link','sm')} Demo</a>` : ''}
+      ${editable ? `<span class="grow"></span><button class="btn btn-g btn-sm" data-act="editProj" data-id="${p.id}" aria-label="Editar">${ic('edit','sm')}</button><button class="btn btn-g btn-sm" data-act="delProj" data-id="${p.id}" aria-label="Eliminar">${ic('trash','sm')}</button>` : ''}
+    </div></div></article>`;
+}
+
+/* ---------- Autenticación ---------- */
+const err = k => S.errors[k] ? `<span class="err">${esc(S.errors[k])}</span>` : '';
+const bad = k => S.errors[k] ? 'bad' : '';
+function vLogin(){
+  return `<div class="wrap"><div class="auth card stack">
+    <div><h1>Iniciar sesión</h1><p class="muted" style="margin-top:4px">Accede a tu panel de PractiFP.</p></div>
+    <form class="stack" data-form="login" novalidate>
+      <div class="field"><label for="l-email">Correo electrónico</label><input class="inp ${bad('email')}" id="l-email" name="email" type="email" autocomplete="email">${err('email')}</div>
+      <div class="field"><label for="l-pass">Contraseña</label><input class="inp ${bad('pass')}" id="l-pass" name="pass" type="password" autocomplete="current-password">${err('pass')}</div>
+      ${err('login')}
+      <button class="btn btn-p" type="submit" ${S.loading ? 'disabled' : ''}>${S.loading ? '<span class="spin"></span> Comprobando…' : 'Entrar'}</button>
+    </form>
+    <div class="stack" style="gap:8px"><span class="eyebrow">Cuentas de ejemplo (contraseña: ${CRED})</span>
+      <div class="demo-acc">
+        <button data-act="fillLogin" data-id="lucia.martin@correo.example">${avatar(alu(1),'sm')}<span class="grow"><b>Lucía Martín</b><br><span class="muted" style="font-size:.8rem">Alumna · DAM</span></span></button>
+        <button data-act="fillLogin" data-id="rrhh@nubalia.example">${elogoSm(emp(1))}<span class="grow"><b>Nubalia Software</b><br><span class="muted" style="font-size:.8rem">Empresa</span></span></button>
+        <button data-act="fillLogin" data-id="admin@practifp.es"><span class="avatar sm" style="background:var(--fg);color:var(--bg)">${ic('shield','sm')}</span><span class="grow"><b>Administración</b><br><span class="muted" style="font-size:.8rem">Administrador</span></span></button>
+      </div></div>
+    <p class="muted" style="text-align:center">¿No tienes cuenta? <button class="linkish" data-go="registro">Regístrate</button></p>
+  </div></div>`;
+}
+function vRegistro(){
+  const t = S.regTipo || 'ALUMNO';
+  return `<div class="wrap"><div class="auth card stack" style="max-width:560px">
+    <div><h1>Crear cuenta</h1><p class="muted" style="margin-top:4px">Elige el tipo de cuenta.</p></div>
+    <form class="stack" data-form="registro" novalidate>
+      <div class="radio-cards">
+        <label><input type="radio" name="tipo" value="ALUMNO" ${t === 'ALUMNO' ? 'checked' : ''} data-act="regTipo"><span><b>Alumno</b><br><span class="muted" style="font-size:.82rem">Busco prácticas</span></span></label>
+        <label><input type="radio" name="tipo" value="EMPRESA" ${t === 'EMPRESA' ? 'checked' : ''} data-act="regTipo"><span><b>Empresa</b><br><span class="muted" style="font-size:.82rem">Ofrezco prácticas</span></span></label>
+      </div>
+      ${t === 'ALUMNO' ? `<div class="grid2">
+        <div class="field"><label for="r-nombre">Nombre</label><input class="inp ${bad('nombre')}" id="r-nombre" name="nombre">${err('nombre')}</div>
+        <div class="field"><label for="r-apellidos">Apellidos</label><input class="inp ${bad('apellidos')}" id="r-apellidos" name="apellidos">${err('apellidos')}</div></div>
+        <div class="field"><label for="r-ciclo">Ciclo formativo</label><select class="inp" id="r-ciclo" name="ciclo">${D.ciclos.map(c => `<option value="${c.c}">${c.c} · ${c.n}</option>`).join('')}</select></div>`
+      : `<div class="grid2"><div class="field"><label for="r-nombre">Nombre de la empresa</label><input class="inp ${bad('nombre')}" id="r-nombre" name="nombre">${err('nombre')}</div>
+        <div class="field"><label for="r-loc">Localidad</label><input class="inp ${bad('localidad')}" id="r-loc" name="localidad">${err('localidad')}</div></div>`}
+      <div class="field"><label for="r-email">Correo electrónico</label><input class="inp ${bad('email')}" id="r-email" name="email" type="email">${err('email')}</div>
+      <div class="grid2">
+        <div class="field"><label for="r-pass">Contraseña</label><input class="inp ${bad('pass')}" id="r-pass" name="pass" type="password"><span class="hint">Mínimo 8 caracteres.</span>${err('pass')}</div>
+        <div class="field"><label for="r-pass2">Repetir contraseña</label><input class="inp ${bad('pass2')}" id="r-pass2" name="pass2" type="password">${err('pass2')}</div></div>
+      <button class="btn btn-p" type="submit">Crear cuenta</button>
+    </form>
+    <p class="muted" style="text-align:center">¿Ya tienes cuenta? <button class="linkish" data-go="login">Inicia sesión</button></p>
+  </div></div>`;
+}
+function vNoEncontrado(){ return `<div class="wrap" style="padding-block:60px"><div class="empty"><h2>No hemos encontrado esta página</h2><p style="margin-top:8px">Puede que se haya eliminado.</p><button class="btn btn-p" style="margin-top:14px" data-go="inicio">Ir al inicio</button></div></div>`; }
+function vSinAcceso(){ return `<div class="wrap" style="padding-block:60px"><div class="empty">${ic('lock')}<h2 style="margin-top:8px">Necesitas iniciar sesión</h2><p style="margin-top:8px">Esta sección solo está disponible para usuarios con el rol adecuado.</p><button class="btn btn-p" style="margin-top:14px" data-go="login">Iniciar sesión</button></div></div>`; }
+
+/* ---------- Paneles ---------- */
+const SECS = {
+  ALUMNO: [['dashboard','Dashboard','grid'],['perfil','Mi perfil','user'],['portfolio','Mi portfolio','code'],['tecnologias','Mis tecnologías','layers'],['candidaturas','Mis candidaturas','briefcase'],['favoritos','Mis favoritos','heart'],['configuracion','Configuración','settings']],
+  EMPRESA: [['dashboard','Dashboard','grid'],['perfil','Perfil de empresa','building'],['ofertas','Mis ofertas','briefcase'],['crear','Crear oferta','plus'],['candidatos','Candidatos','users'],['procesos','Procesos de selección','layers']],
+  ADMIN: [['dashboard','Dashboard','grid'],['usuarios','Usuarios','users'],['empresas','Empresas','building'],['verificacion','Verificación','shield'],['ofertas','Ofertas','briefcase'],['valoraciones','Valoraciones','star']]
+};
+function vPanel(){
+  if (!SECS[S.rol]) return vSinAcceso();
+  let who = '', badge = {};
+  if (S.rol === 'ALUMNO') { const a = meAlumno(); who = `${avatar(a,'sm')}<div><b style="font-size:.9rem">${esc(a.nombre)} ${esc(a.apellidos.split(' ')[0])}</b><div class="muted" style="font-size:.78rem">Alumno · ${a.ciclo}</div></div>`; }
+  if (S.rol === 'EMPRESA') { const e = meEmpresa(); who = `${elogoSm(e, 34)}<div><b style="font-size:.9rem">${esc(e.nombre)}</b><div class="muted" style="font-size:.78rem">Empresa</div></div>`;
+    badge.candidatos = D.candidaturas.filter(c => c.estado === 'ENVIADA' && ofe(c.ofertaId)?.empresaId === e.id).length; }
+  if (S.rol === 'ADMIN') { who = `<span class="avatar sm" style="background:var(--fg);color:var(--bg)">${ic('shield','sm')}</span><div><b style="font-size:.9rem">Administración</b><div class="muted" style="font-size:.78rem">admin@practifp.es</div></div>`;
+    badge.verificacion = D.empresas.filter(e => !e.verificada).length; badge.valoraciones = D.valoraciones.filter(v => v.estado === 'PENDIENTE').length; }
+  const body = (P[S.rol][S.sec] || P[S.rol].dashboard)();
+  return `<div class="wrap panel"><nav class="side" aria-label="Secciones del panel"><div class="who">${who}</div>
+    ${SECS[S.rol].map(([k,l,i]) => `<button class="${S.sec === k || (k === 'crear' && S.sec === 'editar') ? 'on' : ''}" data-go="panel" data-sec="${k}">${ic(i)} ${l}${badge[k] ? `<span class="badge">${badge[k]}</span>` : ''}</button>`).join('')}
+    </nav><section class="stack" style="gap:20px;min-width:0">${body}</section></div>`;
+}
+const head = (t, sub = '', action = '') => `<div class="row between"><div><h1>${t}</h1>${sub ? `<p class="muted" style="margin-top:4px">${sub}</p>` : ''}</div>${action}</div>`;
+
+function progreso(estado){
+  const pasos = ['ENVIADA','REVISADA','ENTREVISTA','ACEPTADA'];
+  if (estado === 'RECHAZADA') return `<div class="prog"><span class="s done"><i></i>ENVIADA</span><span class="bar done"></span><span class="s rej"><i></i>RECHAZADA</span></div>`;
+  const k = pasos.indexOf(estado);
+  return `<div class="prog">${pasos.map((p,i) => `${i ? `<span class="bar ${i <= k ? 'done' : ''}"></span>` : ''}<span class="s ${i <= k ? 'done' : ''}"><i></i>${p}</span>`).join('')}</div>`;
+}
+
+const P = { ALUMNO:{}, EMPRESA:{}, ADMIN:{} };
+/* Alumno */
+P.ALUMNO.dashboard = () => {
+  const a = meAlumno(), cs = D.candidaturas.filter(c => c.alumnoId === a.id);
+  const favs = D.favoritos.filter(f => f.alumnoId === a.id).map(f => ofe(f.ofertaId));
+  const prox = favs.filter(ofertaAbierta).filter(o => !candDe(o.id)).sort((x,y) => x.limite.localeCompare(y.limite));
+  const nuevas = D.ofertas.filter(o => o.ciclo === a.ciclo && ofertaAbierta(o) && !candDe(o.id)).slice(0,3);
+  return `${head(`Hola, ${esc(a.nombre)}`, 'Este es el resumen de tu búsqueda de prácticas.')}
+  <div class="tiles">
+    <div class="tile hl"><b>${cs.length}</b><span>Candidaturas</span></div>
+    <div class="tile"><b>${cs.filter(c => c.estado === 'ENTREVISTA').length}</b><span>En entrevista</span></div>
+    <div class="tile"><b>${favs.length}</b><span>Favoritos</span></div>
+    <div class="tile"><b>${D.proyectos.filter(p => p.alumnoId === a.id).length}</b><span>Proyectos</span></div>
+  </div>
+  <div class="grid2" style="align-items:start">
+    <div class="card"><div class="card-h"><h3>Últimas candidaturas</h3><button class="btn btn-g btn-sm" data-go="panel" data-sec="candidaturas">Ver todas</button></div>
+      <div class="list">${cs.sort((x,y) => y.fecha.localeCompare(x.fecha)).slice(0,4).map(c => { const o = ofe(c.ofertaId); return `<div class="li"><div class="grow"><button class="linkish" data-go="oferta" data-id="${o.id}">${esc(o.titulo)}</button><div class="muted" style="font-size:.82rem">${esc(emp(o.empresaId).nombre)} · ${fmtShort(c.fecha)}</div></div>${st(c.estado)}</div>`; }).join('') || '<div class="muted">Aún no te has inscrito en ninguna oferta.</div>'}</div></div>
+    <div class="card"><div class="card-h"><h3>Favoritos que cierran pronto</h3></div>
+      <div class="list">${prox.map(o => `<div class="li"><div class="grow"><button class="linkish" data-go="oferta" data-id="${o.id}">${esc(o.titulo)}</button><div class="muted" style="font-size:.82rem">${esc(emp(o.empresaId).nombre)}</div></div>${plazoTxt(o)}</div>`).join('') || '<div class="muted">No tienes favoritos pendientes de inscribirte.</div>'}</div></div>
+  </div>
+  <div class="stack"><div class="row between"><h2>Nuevas ofertas de ${a.ciclo}</h2><button class="btn btn-o btn-sm" data-act="byCiclo" data-id="${a.ciclo}">Ver todas</button></div>
+    ${nuevas.length ? `<div class="ocards">${nuevas.map(ofertaCard).join('')}</div>` : '<div class="empty">No hay ofertas nuevas de tu ciclo.</div>'}</div>`;
+};
+P.ALUMNO.perfil = () => {
+  const a = meAlumno();
+  return `${head('Mi perfil', 'Así te verán las empresas.', `<button class="btn btn-o" data-go="alumno" data-id="${a.id}">${ic('eye')} Ver perfil público</button>`)}
+  <form class="card stack" data-form="perfilAlumno" novalidate>
+    <div class="grid2">
+      <div class="field"><label for="pa-nombre">Nombre</label><input class="inp ${bad('nombre')}" id="pa-nombre" name="nombre" value="${esc(a.nombre)}">${err('nombre')}</div>
+      <div class="field"><label for="pa-ape">Apellidos</label><input class="inp ${bad('apellidos')}" id="pa-ape" name="apellidos" value="${esc(a.apellidos)}">${err('apellidos')}</div>
+      <div class="field"><label for="pa-ciclo">Ciclo formativo</label><select class="inp" id="pa-ciclo" name="ciclo">${D.ciclos.map(c => `<option value="${c.c}" ${a.ciclo === c.c ? 'selected' : ''}>${c.c} · ${c.n}</option>`).join('')}</select></div>
+      <div class="field"><label for="pa-curso">Curso</label><select class="inp" id="pa-curso" name="curso">${['1º','2º'].map(c => `<option ${a.curso === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label for="pa-centro">Centro educativo</label><input class="inp ${bad('centro')}" id="pa-centro" name="centro" value="${esc(a.centro)}">${err('centro')}</div>
+      <div class="field"><label for="pa-loc">Localidad</label><input class="inp ${bad('localidad')}" id="pa-loc" name="localidad" value="${esc(a.localidad)}">${err('localidad')}</div>
+    </div>
+    <div class="field"><label for="pa-desc">Descripción personal y profesional</label><textarea class="inp" id="pa-desc" name="descripcion" maxlength="600">${esc(a.descripcion)}</textarea><span class="hint">Máximo 600 caracteres.</span></div>
+    <div class="row"><button class="btn btn-p" type="submit">Guardar cambios</button></div>
+  </form>
+  <div class="card stack"><h3>Currículum</h3>
+    <div class="row">${a.cv ? `<span class="chip">${ic('file','sm')} ${esc(a.cv)}</span><button class="btn btn-o btn-sm" data-act="verCV" data-id="${a.id}">${ic('eye','sm')} Ver</button><button class="btn btn-d btn-sm" data-act="delCV">${ic('trash','sm')} Eliminar</button>` : '<span class="muted">No has subido tu currículum.</span>'}</div>
+    <div class="field"><label for="pa-cv">${a.cv ? 'Reemplazar currículum' : 'Subir currículum'}</label><input class="inp" type="file" id="pa-cv" accept="application/pdf" data-act="cvFile"><span class="hint">Solo PDF, máximo 5 MB. Solo lo verán las empresas en las que te inscribas.</span>${err('cv')}</div>
+  </div>`;
+};
+P.ALUMNO.portfolio = () => {
+  const a = meAlumno(), ps = D.proyectos.filter(p => p.alumnoId === a.id).sort((x,y) => y.fecha.localeCompare(x.fecha));
+  return `${head('Mi portfolio', 'Tus proyectos aparecen en tu perfil público.', `<button class="btn btn-p" data-act="newProj">${ic('plus')} Añadir proyecto</button>`)}
+  ${ps.length ? `<div class="pgrid">${ps.map(p => projCard(p, true)).join('')}</div>` : `<div class="empty"><b>Todavía no tienes proyectos.</b><br>Añade el primero para que las empresas vean lo que sabes hacer.</div>`}`;
+};
+P.ALUMNO.tecnologias = () => {
+  const a = meAlumno(), libres = D.tecnologias.filter(t => !a.tecs.some(x => x.t === t));
+  return `${head('Mis tecnologías', 'Indica qué conoces y tu nivel. Las empresas lo comparan con lo que piden en sus ofertas.')}
+  <div class="card stack">
+    <form class="row" data-form="addTec" style="align-items:end">
+      <div class="field grow"><label for="at-t">Tecnología</label><select class="inp" id="at-t" name="t" ${libres.length ? '' : 'disabled'}>${libres.map(t => `<option>${esc(t)}</option>`).join('')}</select></div>
+      <div class="field"><label for="at-n">Nivel</label><select class="inp" id="at-n" name="n"><option>Básico</option><option selected>Intermedio</option><option>Avanzado</option></select></div>
+      <button class="btn btn-p" type="submit" ${libres.length ? '' : 'disabled'}>${ic('plus')} Añadir</button>
+    </form>
+    ${a.tecs.length ? `<div class="tbl-wrap"><table><thead><tr><th>Tecnología</th><th>Nivel</th><th></th><th></th></tr></thead><tbody>
+      ${a.tecs.map((t,i) => `<tr><td><b>${esc(t.t)}</b></td><td><select class="inp" style="width:auto" id="tn-${i}" data-act="tecNivel" data-id="${esc(t.t)}">${['Básico','Intermedio','Avanzado'].map(n => `<option ${t.n === n ? 'selected' : ''}>${n}</option>`).join('')}</select></td><td>${lvl(t.n)}</td>
+      <td style="text-align:right"><button class="btn btn-g btn-sm" data-act="delTec" data-id="${esc(t.t)}" aria-label="Quitar ${esc(t.t)}">${ic('trash','sm')}</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Añade tu primera tecnología.</div>'}
+  </div>`;
+};
+P.ALUMNO.candidaturas = () => {
+  const a = meAlumno(), cs = D.candidaturas.filter(c => c.alumnoId === a.id).sort((x,y) => y.fecha.localeCompare(x.fecha));
+  return `${head('Mis candidaturas', `${cs.length} ${cs.length === 1 ? 'inscripción' : 'inscripciones'}`)}
+  ${cs.length ? cs.map(c => { const o = ofe(c.ofertaId), e = emp(o.empresaId), fs = fasesDe(o.id);
+    const ya = D.valoraciones.find(v => v.alumnoId === a.id && v.empresaId === e.id);
+    return `<div class="cand"><div class="row" style="align-items:flex-start;flex-wrap:nowrap">${elogo(e)}
+      <div class="grow"><div class="row between"><button class="linkish" style="font-size:1.02rem" data-go="oferta" data-id="${o.id}">${esc(o.titulo)}</button>${st(c.estado)}</div>
+      <div class="muted" style="font-size:.85rem">${esc(e.nombre)} · ${esc(o.localidad)} · Inscrito el ${fmt(c.fecha)}</div>
+      ${progreso(c.estado)}
+      <div class="row" style="margin-top:12px">
+        ${fs.length ? `<button class="btn btn-o btn-sm" data-act="verFases" data-id="${o.id}">${ic('layers','sm')} Ver proceso (${fs.length} fases)</button>` : ''}
+        ${c.estado === 'ACEPTADA' ? (ya ? `<span class="muted" style="font-size:.84rem">Valoración ${ya.estado.toLowerCase()}</span>` : `<button class="btn btn-a btn-sm" data-act="valorar" data-id="${e.id}">${ic('star','sm')} Valorar empresa</button>`) : ''}
+      </div></div></div></div>`; }).join('') : `<div class="empty">No te has inscrito en ninguna oferta todavía.<div style="margin-top:12px"><button class="btn btn-p" data-go="ofertas">Buscar ofertas</button></div></div>`}`;
+};
+P.ALUMNO.favoritos = () => {
+  const a = meAlumno(), fs = D.favoritos.filter(f => f.alumnoId === a.id).map(f => ofe(f.ofertaId));
+  return `${head('Mis favoritos', 'Ofertas que has guardado para revisar más tarde.')}
+  ${fs.length ? `<div class="ocards">${fs.map(ofertaCard).join('')}</div>` : `<div class="empty">No tienes ofertas guardadas. Pulsa el corazón en una oferta para guardarla.<div style="margin-top:12px"><button class="btn btn-p" data-go="ofertas">Buscar ofertas</button></div></div>`}`;
+};
+P.ALUMNO.configuracion = () => cfgHTML();
+function cfgHTML(){
+  const u = usr(S.uid);
+  return `${head('Configuración', 'Datos de acceso a tu cuenta.')}
+  <form class="card stack" data-form="cfgEmail" novalidate><h3>Correo electrónico</h3>
+    <div class="field"><label for="c-email">Correo</label><input class="inp ${bad('cemail')}" id="c-email" name="email" type="email" value="${esc(u.email)}">${err('cemail')}</div>
+    <div><button class="btn btn-p" type="submit">Actualizar correo</button></div></form>
+  <form class="card stack" data-form="cfgPass" novalidate><h3>Contraseña</h3>
+    <div class="grid3">
+      <div class="field"><label for="c-p0">Contraseña actual</label><input class="inp ${bad('p0')}" id="c-p0" name="p0" type="password">${err('p0')}</div>
+      <div class="field"><label for="c-p1">Nueva contraseña</label><input class="inp ${bad('p1')}" id="c-p1" name="p1" type="password">${err('p1')}</div>
+      <div class="field"><label for="c-p2">Repetir nueva</label><input class="inp ${bad('p2')}" id="c-p2" name="p2" type="password">${err('p2')}</div></div>
+    <div><button class="btn btn-p" type="submit">Cambiar contraseña</button></div></form>`;
+}
+
+/* Empresa */
+P.EMPRESA.dashboard = () => {
+  const e = meEmpresa(), ofs = D.ofertas.filter(o => o.empresaId === e.id);
+  const cs = D.candidaturas.filter(c => ofs.some(o => o.id === c.ofertaId)).sort((x,y) => y.fecha.localeCompare(x.fecha));
+  const vals = valAprob(e.id), m = media(e.id);
+  return `${head(esc(e.nombre), 'Resumen de tus ofertas y candidatos.', `<button class="btn btn-p" data-go="panel" data-sec="crear">${ic('plus')} Crear oferta</button>`)}
+  ${e.verificada ? '' : `<div class="notice">${ic('info')}<span>Tu empresa está pendiente de verificación. El equipo de PractiFP revisará tus datos.</span></div>`}
+  <div class="tiles">
+    <div class="tile hl"><b>${ofs.filter(ofertaAbierta).length}</b><span>Ofertas abiertas</span></div>
+    <div class="tile"><b>${cs.length}</b><span>Candidaturas recibidas</span></div>
+    <div class="tile"><b>${cs.filter(c => c.estado === 'ENVIADA').length}</b><span>Sin revisar</span></div>
+    <div class="tile"><b>${vals.length ? m.toFixed(1) : '—'}</b><span>Valoración media</span></div>
+  </div>
+  <div class="grid2" style="align-items:start">
+    <div class="card"><div class="card-h"><h3>Últimas candidaturas</h3><button class="btn btn-g btn-sm" data-go="panel" data-sec="candidatos">Gestionar</button></div>
+      <div class="list">${cs.slice(0,5).map(c => { const a = alu(c.alumnoId), o = ofe(c.ofertaId); return `<div class="li">${avatar(a,'sm')}<div class="grow"><button class="linkish" data-go="alumno" data-id="${a.id}">${esc(a.nombre)} ${esc(a.apellidos)}</button><div class="muted" style="font-size:.82rem">${esc(o.titulo)} · ${fmtShort(c.fecha)}</div></div>${st(c.estado)}</div>`; }).join('') || '<div class="muted">Aún no has recibido candidaturas.</div>'}</div></div>
+    <div class="card"><div class="card-h"><h3>Valoraciones recibidas</h3>${vals.length ? stars(m) : ''}</div>
+      <div class="list">${vals.map(v => `<div class="li" style="align-items:flex-start"><div class="grow"><div class="row between">${stars(v.puntuacion)}<span class="muted" style="font-size:.8rem">${fmt(v.fecha)}</span></div><p style="font-size:.9rem;margin-top:4px">${esc(v.comentario)}</p></div></div>`).join('') || '<div class="muted">Todavía no tienes valoraciones publicadas.</div>'}</div></div>
+  </div>`;
+};
+P.EMPRESA.perfil = () => {
+  const e = meEmpresa(), d = S.pickCoords || {lat:e.lat, lng:e.lng};
+  return `${head('Perfil de empresa', 'Información pública que verán los alumnos.', `<button class="btn btn-o" data-go="empresa" data-id="${e.id}">${ic('eye')} Ver ficha pública</button>`)}
+  <form class="card stack" data-form="perfilEmpresa" novalidate>
+    <div class="grid2">
+      <div class="field"><label for="pe-nombre">Nombre</label><input class="inp ${bad('nombre')}" id="pe-nombre" name="nombre" value="${esc(e.nombre)}">${err('nombre')}</div>
+      <div class="field"><label for="pe-web">Página web</label><input class="inp ${bad('web')}" id="pe-web" name="web" value="${esc(e.web)}">${err('web')}</div>
+      <div class="field"><label for="pe-tel">Teléfono</label><input class="inp ${bad('telefono')}" id="pe-tel" name="telefono" value="${esc(e.telefono)}">${err('telefono')}</div>
+      <div class="field"><label for="pe-loc">Localidad</label><input class="inp ${bad('localidad')}" id="pe-loc" name="localidad" value="${esc(e.localidad)}">${err('localidad')}</div>
+    </div>
+    <div class="field"><label for="pe-dir">Dirección</label><input class="inp ${bad('direccion')}" id="pe-dir" name="direccion" value="${esc(e.direccion)}">${err('direccion')}</div>
+    <div class="field"><label for="pe-desc">Descripción</label><textarea class="inp" id="pe-desc" name="descripcion">${esc(e.descripcion)}</textarea></div>
+    <div class="stack" style="gap:8px"><span class="lbl">Ubicación en el mapa</span><span class="hint muted" style="font-size:.8rem">Pulsa sobre el mapa para colocar tu empresa o escribe las coordenadas.</span>
+      <div class="map-box" style="max-width:520px">${mapSVG({empresas:[{...e, lat:d.lat, lng:d.lng}], pick:true, single:true})}</div>
+      <div class="grid2" style="max-width:520px">
+        <div class="field"><label for="pe-lat">Latitud</label><input class="inp mono ${bad('lat')}" id="pe-lat" name="lat" value="${d.lat}" inputmode="decimal">${err('lat')}</div>
+        <div class="field"><label for="pe-lng">Longitud</label><input class="inp mono ${bad('lng')}" id="pe-lng" name="lng" value="${d.lng}" inputmode="decimal">${err('lng')}</div></div></div>
+    <div class="row"><button class="btn btn-p" type="submit">Guardar cambios</button><span class="row" style="gap:6px">Estado: ${verif(e)}</span></div>
+  </form>`;
+};
+P.EMPRESA.ofertas = () => {
+  const e = meEmpresa(), ofs = D.ofertas.filter(o => o.empresaId === e.id).sort((x,y) => y.publicada.localeCompare(x.publicada));
+  return `${head('Mis ofertas', `${ofs.length} ofertas publicadas`, `<button class="btn btn-p" data-go="panel" data-sec="crear">${ic('plus')} Crear oferta</button>`)}
+  ${ofs.length ? `<div class="tbl-wrap"><table><thead><tr><th>Oferta</th><th>Estado</th><th>Plazo</th><th>Candidatos</th><th>Fases</th><th style="text-align:right">Acciones</th></tr></thead><tbody>
+  ${ofs.map(o => { const n = D.candidaturas.filter(c => c.ofertaId === o.id).length; return `<tr>
+    <td><button class="linkish" data-go="oferta" data-id="${o.id}">${esc(o.titulo)}</button><div class="muted" style="font-size:.8rem"><span class="chip ciclo">${o.ciclo}</span> ${o.modalidad} · ${o.plazas} plazas</div></td>
+    <td><label class="check"><input type="checkbox" data-act="toggleActiva" data-id="${o.id}" ${o.activa ? 'checked' : ''}> ${o.activa ? 'Activa' : 'Inactiva'}</label></td>
+    <td style="white-space:nowrap">${fmt(o.limite)}</td>
+    <td><button class="btn btn-g btn-sm" data-act="verCandidatos" data-id="${o.id}">${ic('users','sm')} ${n}</button></td>
+    <td><button class="btn btn-g btn-sm" data-act="verProceso" data-id="${o.id}">${ic('layers','sm')} ${fasesDe(o.id).length}</button></td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn btn-o btn-sm" data-act="editOferta" data-id="${o.id}">${ic('edit','sm')} Editar</button> <button class="btn btn-d btn-sm" data-act="delOferta" data-id="${o.id}" aria-label="Eliminar">${ic('trash','sm')}</button></td></tr>`; }).join('')}
+  </tbody></table></div>` : `<div class="empty">Aún no has publicado ofertas.<div style="margin-top:12px"><button class="btn btn-p" data-go="panel" data-sec="crear">Crear la primera</button></div></div>`}`;
+};
+function ofertaForm(o){
+  const edit = !!o;
+  o = o || {titulo:'', descripcion:'', ciclo:'DAM', localidad: meEmpresa().localidad, modalidad:'Presencial', remunerada:true, salario:'', plazas:1, limite:'', activa:true};
+  if (!S.draftTecs) S.draftTecs = edit ? o.tecs.map(t => ({...t})) : [];
+  const libres = D.tecnologias.filter(t => !S.draftTecs.some(x => x.t === t));
+  const v = (k, d) => S.formVals && k in S.formVals ? S.formVals[k] : d;
+  const rem = v('remunerada', o.remunerada);
+  return `${head(edit ? 'Editar oferta' : 'Crear oferta', edit ? esc(o.titulo) : 'Los campos marcados con * son obligatorios.')}
+  <form class="card stack" data-form="oferta" novalidate>
+    <div class="field"><label for="of-titulo">Título *</label><input class="inp ${bad('titulo')}" id="of-titulo" name="titulo" value="${esc(v('titulo', o.titulo))}" placeholder="Ej.: Desarrollo web con React">${err('titulo')}</div>
+    <div class="field"><label for="of-desc">Descripción *</label><textarea class="inp ${bad('descripcion')}" id="of-desc" name="descripcion" placeholder="Qué hará el alumno, con qué equipo y qué aprenderá">${esc(v('descripcion', o.descripcion))}</textarea>${err('descripcion')}</div>
+    <div class="grid3">
+      <div class="field"><label for="of-ciclo">Ciclo formativo *</label><select class="inp" id="of-ciclo" name="ciclo">${D.ciclos.map(c => `<option value="${c.c}" ${v('ciclo', o.ciclo) === c.c ? 'selected' : ''}>${c.c}</option>`).join('')}</select></div>
+      <div class="field"><label for="of-loc">Localidad *</label><input class="inp ${bad('localidad')}" id="of-loc" name="localidad" value="${esc(v('localidad', o.localidad))}">${err('localidad')}</div>
+      <div class="field"><label for="of-plazas">Plazas *</label><input class="inp ${bad('plazas')}" id="of-plazas" name="plazas" type="number" min="1" value="${esc(v('plazas', o.plazas))}">${err('plazas')}</div>
+    </div>
+    <div class="field"><span class="lbl">Modalidad *</span><div class="radio-cards">${['Presencial','Híbrida','Remota'].map(m => `<label><input type="radio" name="modalidad" value="${m}" ${v('modalidad', o.modalidad) === m ? 'checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
+    <div class="grid3" style="align-items:end">
+      <label class="check" style="padding-bottom:10px"><input type="checkbox" name="remunerada" id="of-rem" data-act="remToggle" ${rem ? 'checked' : ''}> Prácticas remuneradas</label>
+      <div class="field"><label for="of-sal">Salario mensual (€)</label><input class="inp ${bad('salario')}" id="of-sal" name="salario" type="number" min="0" step="10" value="${esc(v('salario', o.salario ?? ''))}" ${rem ? '' : 'disabled'}>${err('salario')}</div>
+      <div class="field"><label for="of-lim">Fecha límite de inscripción *</label><input class="inp ${bad('limite')}" id="of-lim" name="limite" type="date" value="${esc(v('limite', o.limite))}">${err('limite')}</div>
+    </div>
+    <div class="field"><span class="lbl">Tecnologías requeridas</span>
+      <div class="stack" style="gap:6px">${S.draftTecs.map((t,i) => `<div class="tec-ed"><b class="grow">${esc(t.t)}</b><label class="check"><input type="checkbox" data-act="tecOb" data-id="${i}" ${t.ob ? 'checked' : ''}> Obligatoria</label><button type="button" class="btn btn-g btn-sm" data-act="tecRm" data-id="${i}" aria-label="Quitar">${ic('x','sm')}</button></div>`).join('')}</div>
+      <div class="row"><select class="inp" style="width:auto" id="of-tecsel" aria-label="Tecnología">${libres.map(t => `<option>${esc(t)}</option>`).join('')}</select><button type="button" class="btn btn-o btn-sm" data-act="tecAdd">${ic('plus','sm')} Añadir tecnología</button></div>${err('tecs')}</div>
+    <label class="check"><input type="checkbox" name="activa" id="of-activa" ${v('activa', o.activa) ? 'checked' : ''}> Oferta activa (visible para los alumnos)</label>
+    <div class="row"><button class="btn btn-p" type="submit">${edit ? 'Guardar cambios' : 'Publicar oferta'}</button><button type="button" class="btn btn-g" data-go="panel" data-sec="ofertas">Cancelar</button></div>
+  </form>`;
+}
+P.EMPRESA.crear = () => ofertaForm(null);
+P.EMPRESA.editar = () => ofertaForm(ofe(S.editOferta));
+P.EMPRESA.candidatos = () => {
+  const e = meEmpresa(), ofs = D.ofertas.filter(o => o.empresaId === e.id);
+  const cs = D.candidaturas.filter(c => ofs.some(o => o.id === c.ofertaId) && (!S.candOferta || c.ofertaId == S.candOferta)).sort((x,y) => y.fecha.localeCompare(x.fecha));
+  return `${head('Candidatos', 'Revisa los perfiles y actualiza el estado de cada candidatura.')}
+  <div class="row"><div class="field" style="min-width:min(320px,100%)"><label for="cand-of">Oferta</label><select class="inp" id="cand-of" data-act="candOferta"><option value="">Todas las ofertas</option>${ofs.map(o => `<option value="${o.id}" ${S.candOferta == o.id ? 'selected' : ''}>${esc(o.titulo)}</option>`).join('')}</select></div></div>
+  ${cs.length ? `<div class="tbl-wrap"><table><thead><tr><th>Alumno</th><th>Oferta</th><th>Coincidencia</th><th>Inscripción</th><th>Estado</th><th></th></tr></thead><tbody>
+  ${cs.map(c => { const a = alu(c.alumnoId), o = ofe(c.ofertaId); const obl = o.tecs.filter(t => t.ob), ok = obl.filter(t => a.tecs.some(x => x.t === t.t)).length;
+    return `<tr><td><div class="row" style="flex-wrap:nowrap">${avatar(a,'sm')}<div><button class="linkish" data-go="alumno" data-id="${a.id}">${esc(a.nombre)} ${esc(a.apellidos)}</button><div class="muted" style="font-size:.8rem"><span class="chip ciclo">${a.ciclo}</span> ${esc(a.localidad)}</div></div></div></td>
+    <td>${esc(o.titulo)}</td><td><span class="mono">${ok}/${obl.length}</span> <span class="muted" style="font-size:.8rem">obligatorias</span></td><td style="white-space:nowrap">${fmt(c.fecha)}</td>
+    <td><select class="inp" style="width:auto" id="ce-${c.id}" data-act="estadoCand" data-id="${c.id}" aria-label="Estado de la candidatura">${['ENVIADA','REVISADA','ENTREVISTA','ACEPTADA','RECHAZADA'].map(s => `<option ${c.estado === s ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+    <td>${a.cv ? `<button class="btn btn-o btn-sm" data-act="verCV" data-id="${a.id}">${ic('file','sm')} CV</button>` : '<span class="muted" style="font-size:.8rem">Sin CV</span>'}</td></tr>`; }).join('')}
+  </tbody></table></div>` : '<div class="empty">No hay candidaturas para esta selección.</div>'}`;
+};
+P.EMPRESA.procesos = () => {
+  const e = meEmpresa(), ofs = D.ofertas.filter(o => o.empresaId === e.id);
+  if (!ofs.length) return `${head('Procesos de selección')}<div class="empty">Crea una oferta para definir su proceso.</div>`;
+  if (!S.procOferta || !ofs.some(o => o.id == S.procOferta)) S.procOferta = ofs[0].id;
+  if (!S.draftFases) S.draftFases = fasesDe(S.procOferta).map(f => ({...f}));
+  const fs = S.draftFases, tot = fs.reduce((s,f) => s + (+f.dias || 0), 0);
+  return `${head('Procesos de selección', 'Define las fases que verán los alumnos antes de inscribirse.')}
+  <div class="row"><div class="field" style="min-width:min(320px,100%)"><label for="proc-of">Oferta</label><select class="inp" id="proc-of" data-act="procOferta">${ofs.map(o => `<option value="${o.id}" ${S.procOferta == o.id ? 'selected' : ''}>${esc(o.titulo)}</option>`).join('')}</select></div></div>
+  <form class="stack" data-form="fases" novalidate style="gap:10px">
+    ${fs.map((f,i) => `<div class="fase-ed">
+      <div class="ord"><button type="button" data-act="faseUp" data-id="${i}" ${i ? '' : 'disabled'} aria-label="Subir">${ic('up','sm')}</button><b>${i + 1}</b><button type="button" data-act="faseDown" data-id="${i}" ${i < fs.length - 1 ? '' : 'disabled'} aria-label="Bajar">${ic('down','sm')}</button></div>
+      <div class="stack" style="gap:8px"><input class="inp ${bad('fn' + i)}" id="fn-${i}" data-fase="${i}" data-k="nombre" value="${esc(f.nombre)}" placeholder="Nombre de la fase" aria-label="Nombre de la fase">${err('fn' + i)}
+        <input class="inp" id="fd-${i}" data-fase="${i}" data-k="descripcion" value="${esc(f.descripcion)}" placeholder="Descripción breve" aria-label="Descripción"></div>
+      <div class="field fe-d"><label for="fdias-${i}" style="font-size:.74rem">Duración (días)</label><input class="inp ${bad('fdias' + i)}" id="fdias-${i}" type="number" min="0" data-fase="${i}" data-k="dias" value="${esc(f.dias)}">${err('fdias' + i)}</div>
+      <div class="stack fe-a" style="gap:8px;align-items:flex-start"><label class="check"><input type="checkbox" data-fase="${i}" data-k="obligatoria" ${f.obligatoria ? 'checked' : ''}> Obligatoria</label><button type="button" class="btn btn-g btn-sm" data-act="faseRm" data-id="${i}">${ic('trash','sm')} Quitar</button></div>
+    </div>`).join('') || '<div class="empty">Esta oferta no tiene fases. Añade la primera.</div>'}
+    <div class="row between"><button type="button" class="btn btn-o" data-act="faseAdd">${ic('plus')} Añadir fase</button><span class="muted">Duración total estimada: <b style="color:var(--fg)">${tot} días</b></span></div>
+    <div class="row"><button class="btn btn-p" type="submit">Guardar proceso</button><button type="button" class="btn btn-g" data-act="faseReset">Descartar cambios</button></div>
+  </form>`;
+};
+
+/* Administrador */
+P.ADMIN.dashboard = () => {
+  const pend = D.valoraciones.filter(v => v.estado === 'PENDIENTE'), sinv = D.empresas.filter(e => !e.verificada);
+  return `${head('Panel de administración', 'Estado general de la plataforma.')}
+  <div class="tiles">
+    <div class="tile hl"><b>${D.usuarios.length}</b><span>Usuarios registrados</span></div>
+    <div class="tile"><b>${D.ofertas.filter(ofertaAbierta).length}</b><span>Ofertas abiertas</span></div>
+    <div class="tile"><b>${sinv.length}</b><span>Empresas por verificar</span></div>
+    <div class="tile"><b>${pend.length}</b><span>Valoraciones por moderar</span></div>
+  </div>
+  <div class="grid2" style="align-items:start">
+    <div class="card"><div class="card-h"><h3>Pendientes de verificación</h3><button class="btn btn-g btn-sm" data-go="panel" data-sec="verificacion">Revisar</button></div>
+      <div class="list">${sinv.map(e => `<div class="li">${elogoSm(e, 32)}<div class="grow"><b>${esc(e.nombre)}</b><div class="muted" style="font-size:.8rem">${esc(e.localidad)} · alta ${fmtShort(usr(e.usuarioId).alta)}</div></div><button class="btn btn-p btn-sm" data-act="verificar" data-id="${e.id}">Verificar</button></div>`).join('') || '<div class="muted">No hay empresas pendientes.</div>'}</div></div>
+    <div class="card"><div class="card-h"><h3>Valoraciones por moderar</h3><button class="btn btn-g btn-sm" data-go="panel" data-sec="valoraciones">Moderar</button></div>
+      <div class="list">${pend.map(v => `<div class="li"><div class="grow"><b>${esc(emp(v.empresaId).nombre)}</b> ${stars(v.puntuacion)}<div class="muted" style="font-size:.82rem">${esc(v.comentario.slice(0,80))}…</div></div></div>`).join('') || '<div class="muted">No hay valoraciones pendientes.</div>'}</div></div>
+  </div>
+  <div class="card"><div class="card-h"><h3>Candidaturas por estado</h3></div>
+    <div class="stack" style="gap:8px">${['ENVIADA','REVISADA','ENTREVISTA','ACEPTADA','RECHAZADA'].map(s => { const n = D.candidaturas.filter(c => c.estado === s).length, mx = D.candidaturas.length;
+      return `<div class="row" style="flex-wrap:nowrap"><span style="width:110px">${st(s)}</span><div style="flex:1;height:10px;background:var(--surface-2);border-radius:5px"><div class="st-${s}" style="width:${n / mx * 100}%;height:100%;border-radius:5px;background:currentColor"></div></div><span class="mono" style="width:24px;text-align:right">${n}</span></div>`; }).join('')}</div></div>`;
+};
+P.ADMIN.usuarios = () => {
+  const q = S.adminUserQ.toLowerCase();
+  const us = D.usuarios.filter(u => (!S.adminUserRol || u.rol === S.adminUserRol) && (!q || u.email.includes(q) || nombreUsuario(u).toLowerCase().includes(q)));
+  return `${head('Gestión de usuarios', `${D.usuarios.length} usuarios`)}
+  <div class="row"><div class="field grow" style="max-width:320px"><label for="au-q">Buscar</label><input class="inp" id="au-q" data-adminf="q" value="${esc(S.adminUserQ)}" placeholder="Nombre o correo"></div>
+    <div class="field"><label for="au-rol">Rol</label><select class="inp" id="au-rol" data-adminf="rol"><option value="">Todos</option>${['ALUMNO','EMPRESA','ADMIN'].map(r => `<option ${S.adminUserRol === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Usuario</th><th>Rol</th><th>Alta</th><th>Estado</th><th style="text-align:right">Acción</th></tr></thead><tbody>
+  ${us.map(u => `<tr><td><b>${esc(nombreUsuario(u))}</b><div class="muted" style="font-size:.8rem">${esc(u.email)}</div></td><td><span class="chip">${u.rol}</span></td><td style="white-space:nowrap">${fmt(u.alta)}</td>
+    <td>${u.activo ? '<span class="st st-ACTIVA">ACTIVO</span>' : '<span class="st st-INACTIVA">DESACTIVADO</span>'}</td>
+    <td style="text-align:right">${u.rol === 'ADMIN' ? '<span class="muted" style="font-size:.8rem">—</span>' : `<button class="btn ${u.activo ? 'btn-d' : 'btn-o'} btn-sm" data-act="toggleUser" data-id="${u.id}">${u.activo ? 'Desactivar' : 'Activar'}</button>`}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">Sin resultados.</td></tr>'}
+  </tbody></table></div>`;
+};
+function nombreUsuario(u){
+  if (u.rol === 'ALUMNO') { const a = D.alumnos.find(x => x.usuarioId === u.id); return a ? a.nombre + ' ' + a.apellidos : u.email; }
+  if (u.rol === 'EMPRESA') { const e = D.empresas.find(x => x.usuarioId === u.id); return e ? e.nombre : u.email; }
+  return 'Administración';
+}
+P.ADMIN.empresas = () => `${head('Gestión de empresas', `${D.empresas.length} empresas registradas`)}
+  <div class="tbl-wrap"><table><thead><tr><th>Empresa</th><th>Localidad</th><th>Ofertas</th><th>Valoración</th><th>Verificación</th><th>Cuenta</th><th style="text-align:right">Acciones</th></tr></thead><tbody>
+  ${D.empresas.map(e => { const u = usr(e.usuarioId), m = media(e.id); return `<tr><td><button class="linkish" data-go="empresa" data-id="${e.id}">${esc(e.nombre)}</button><div class="muted" style="font-size:.8rem">${esc(u.email)}</div></td><td>${esc(e.localidad)}</td>
+    <td class="mono">${D.ofertas.filter(o => o.empresaId === e.id).length}</td><td>${m ? `<span class="mono">${m.toFixed(1)}</span>` : '<span class="muted">—</span>'}</td>
+    <td>${e.verificada ? '<span class="st st-VERIFICADA">VERIFICADA</span>' : '<span class="st st-PENDIENTE">PENDIENTE</span>'}</td>
+    <td>${u.activo ? '<span class="st st-ACTIVA">ACTIVA</span>' : '<span class="st st-INACTIVA">DESACTIVADA</span>'}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn btn-o btn-sm" data-act="${e.verificada ? 'desverificar' : 'verificar'}" data-id="${e.id}">${e.verificada ? 'Quitar verificación' : 'Verificar'}</button> <button class="btn ${u.activo ? 'btn-d' : 'btn-o'} btn-sm" data-act="toggleUser" data-id="${u.id}">${u.activo ? 'Desactivar' : 'Activar'}</button></td></tr>`; }).join('')}
+  </tbody></table></div>`;
+P.ADMIN.verificacion = () => {
+  const sinv = D.empresas.filter(e => !e.verificada);
+  return `${head('Verificación de empresas', 'Comprueba los datos antes de marcar una empresa como verificada.')}
+  ${sinv.length ? `<div class="grid2">${sinv.map(e => `<div class="card stack" style="gap:12px">
+    <div class="row" style="flex-wrap:nowrap">${elogo(e)}<div class="grow"><h3>${esc(e.nombre)}</h3><div class="muted" style="font-size:.82rem">Registrada el ${fmt(usr(e.usuarioId).alta)}</div></div></div>
+    <div class="meta" style="flex-direction:column;gap:6px"><span>${ic('pin','sm')} ${esc(e.direccion)}, ${esc(e.localidad)}</span><span>${ic('globe','sm')} ${esc(e.web)}</span><span>${ic('phone','sm')} ${esc(e.telefono)}</span><span>${ic('user','sm')} ${esc(usr(e.usuarioId).email)}</span></div>
+    <p style="font-size:.9rem">${esc(e.descripcion)}</p>
+    <div class="row"><button class="btn btn-p" data-act="verificar" data-id="${e.id}">${ic('shield')} Verificar empresa</button><button class="btn btn-g" data-go="empresa" data-id="${e.id}">Ver ficha</button></div></div>`).join('')}</div>`
+  : `<div class="empty">${ic('check')} Todas las empresas están verificadas.</div>`}`;
+};
+P.ADMIN.ofertas = () => `${head('Gestión de ofertas', `${D.ofertas.length} ofertas`)}
+  <div class="tbl-wrap"><table><thead><tr><th>Oferta</th><th>Empresa</th><th>Ciclo</th><th>Publicada</th><th>Estado</th><th style="text-align:right">Acciones</th></tr></thead><tbody>
+  ${D.ofertas.slice().sort((a,b) => b.publicada.localeCompare(a.publicada)).map(o => `<tr><td><button class="linkish" data-go="oferta" data-id="${o.id}">${esc(o.titulo)}</button></td><td>${esc(emp(o.empresaId).nombre)}</td><td><span class="chip ciclo">${o.ciclo}</span></td><td style="white-space:nowrap">${fmt(o.publicada)}</td>
+    <td>${o.activa ? '<span class="st st-ACTIVA">ACTIVA</span>' : '<span class="st st-INACTIVA">INACTIVA</span>'}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn btn-o btn-sm" data-act="toggleActivaAdm" data-id="${o.id}">${o.activa ? 'Desactivar' : 'Activar'}</button> <button class="btn btn-d btn-sm" data-act="delOferta" data-id="${o.id}" aria-label="Eliminar">${ic('trash','sm')}</button></td></tr>`).join('')}
+  </tbody></table></div>`;
+P.ADMIN.valoraciones = () => {
+  const t = S.adminValTab, vs = D.valoraciones.filter(v => v.estado === t);
+  return `${head('Moderación de valoraciones', 'Las valoraciones solo se publican cuando las apruebas.')}
+  <div class="seg" role="tablist">${[['PENDIENTE','Pendientes'],['APROBADA','Aprobadas'],['RECHAZADA','Rechazadas']].map(([k,l]) => `<button role="tab" aria-selected="${t === k}" class="${t === k ? 'on' : ''}" data-act="valTab" data-id="${k}">${l} (${D.valoraciones.filter(v => v.estado === k).length})</button>`).join('')}</div>
+  ${vs.length ? vs.map(v => { const a = alu(v.alumnoId), e = emp(v.empresaId); return `<div class="card stack" style="gap:10px">
+    <div class="row between"><div class="row">${avatar(a,'sm')}<div><b>${esc(a.nombre)} ${esc(a.apellidos)}</b> <span class="muted">valoró a</span> <button class="linkish" data-go="empresa" data-id="${e.id}">${esc(e.nombre)}</button><div class="muted" style="font-size:.8rem">${fmt(v.fecha)}</div></div></div>${stars(v.puntuacion)}</div>
+    <p>${esc(v.comentario)}</p>
+    <div class="row">${v.estado !== 'APROBADA' ? `<button class="btn btn-p btn-sm" data-act="modVal" data-id="${v.id}" data-v="APROBADA">${ic('check','sm')} Aprobar</button>` : ''}${v.estado !== 'RECHAZADA' ? `<button class="btn btn-d btn-sm" data-act="modVal" data-id="${v.id}" data-v="RECHAZADA">${ic('x','sm')} Rechazar</button>` : ''}</div></div>`; }).join('')
+  : '<div class="empty">No hay valoraciones en esta lista.</div>'}`;
+};
+
+/* ---------- Modales ---------- */
+function modal(title, body){ $('#modalRoot').innerHTML = `<div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modal-h"><h2>${title}</h2><button class="btn btn-g icon-btn" data-act="closeModal" aria-label="Cerrar">${ic('x')}</button></div>${body}</div></div>`; const f = $('#modalRoot input, #modalRoot textarea, #modalRoot .modal button.btn-p'); f && f.focus(); }
+function closeModal(){ $('#modalRoot').innerHTML = ''; S.errors = {}; }
+function confirmModal(title, text, act, id, label = 'Eliminar'){
+  modal(title, `<p>${text}</p><div class="row" style="justify-content:flex-end"><button class="btn btn-g" data-act="closeModal">Cancelar</button><button class="btn btn-d" style="background:var(--bad);color:#fff" data-act="${act}" data-id="${id}">${label}</button></div>`);
+}
+function projModal(p){
+  const a = meAlumno(); S.projImg = p ? p.img : null;
+  modal(p ? 'Editar proyecto' : 'Nuevo proyecto', `<form class="stack" data-form="proyecto" data-id="${p ? p.id : ''}" novalidate>
+    <div class="field"><label for="pr-t">Título *</label><input class="inp" id="pr-t" name="titulo" value="${esc(p?.titulo || '')}"><span class="err" id="e-pr-t"></span></div>
+    <div class="field"><label for="pr-d">Descripción *</label><textarea class="inp" id="pr-d" name="descripcion">${esc(p?.descripcion || '')}</textarea><span class="err" id="e-pr-d"></span></div>
+    <div class="field"><label for="pr-img">Imagen representativa</label><input class="inp" type="file" id="pr-img" accept="image/png,image/jpeg,image/webp" data-act="projImgFile"><span class="hint">JPG, PNG o WebP, máximo 2 MB.</span><span class="err" id="e-pr-img"></span></div>
+    <div class="grid2"><div class="field"><label for="pr-gh">Repositorio de GitHub</label><input class="inp" id="pr-gh" name="github" value="${esc(p?.github || '')}" placeholder="https://github.com/…"><span class="err" id="e-pr-gh"></span></div>
+      <div class="field"><label for="pr-demo">Demo (opcional)</label><input class="inp" id="pr-demo" name="demo" value="${esc(p?.demo || '')}" placeholder="https://…"><span class="err" id="e-pr-demo"></span></div></div>
+    <div class="field"><label for="pr-f">Fecha de creación</label><input class="inp" id="pr-f" name="fecha" type="date" value="${p?.fecha || HOY}"></div>
+    <div class="field"><span class="lbl">Tecnologías utilizadas</span><div class="tec-pick" id="pr-tecs">${D.tecnologias.map(t => `<button type="button" class="${p?.tecs.includes(t) ? 'on' : ''}" data-act="projTec" data-id="${esc(t)}" aria-pressed="${!!p?.tecs.includes(t)}">${esc(t)}</button>`).join('')}</div></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn btn-g" data-act="closeModal">Cancelar</button><button class="btn btn-p" type="submit">${p ? 'Guardar' : 'Añadir proyecto'}</button></div>
+  </form>`);
+}
+function cvModal(a){
+  modal(`Currículum · ${esc(a.nombre)} ${esc(a.apellidos)}`, `<div class="pdf"><div class="row between"><span class="mono">${esc(a.cv)}</span><span class="muted" style="font-size:.8rem">PDF · 1 página</span></div>
+    <div class="page"><h4>${esc(a.nombre)} ${esc(a.apellidos)}</h4><span>${esc(a.ciclo)} · ${esc(a.centro)} · ${esc(a.localidad)}</span><div class="bar2" style="width:90%"></div><div class="bar2" style="width:75%"></div><div class="bar2" style="width:82%"></div>
+    <b style="margin-top:8px">Tecnologías</b><span>${a.tecs.map(t => esc(t.t)).join(' · ')}</span><div class="bar2" style="width:70%"></div><div class="bar2" style="width:60%"></div></div></div>
+    <p class="muted" style="font-size:.84rem">Vista previa simulada. En la aplicación final el PDF se sirve desde el backend solo a usuarios autorizados.</p>`);
+}
+function valorarModal(eid){
+  S.rating = 0; const e = emp(eid);
+  modal(`Valorar ${esc(e.nombre)}`, `<form class="stack" data-form="valorar" data-id="${eid}" novalidate>
+    <div class="field"><span class="lbl">Puntuación *</span><div class="row" id="rate" style="gap:4px">${[1,2,3,4,5].map(i => `<button type="button" class="btn btn-g icon-btn" data-act="rate" data-id="${i}" aria-label="${i} de 5">${ic('star','')}</button>`).join('')}</div><span class="err" id="e-rate"></span></div>
+    <div class="field"><label for="v-com">Comentario *</label><textarea class="inp" id="v-com" name="comentario" maxlength="500" placeholder="¿Qué tal fueron tus prácticas? Tutor, tareas, ambiente…"></textarea><span class="err" id="e-vcom"></span></div>
+    <div class="notice">${ic('info')}<span>Tu valoración se publicará cuando la revise el equipo de moderación. Solo puedes valorar una vez cada empresa.</span></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn btn-g" data-act="closeModal">Cancelar</button><button class="btn btn-p" type="submit">Enviar valoración</button></div></form>`);
+}
+
+/* ---------- Render ---------- */
+function toast(msg, type = ''){ const t = $('#toastRoot'); t.innerHTML = `<div class="toast ${type}" role="status">${ic(type ? 'info' : 'check')} ${esc(msg)}</div>`; clearTimeout(toast.t); toast.t = setTimeout(() => t.innerHTML = '', 2800); }
+function renderHeader(){
+  const links = [['inicio','Inicio'],['ofertas','Buscar ofertas'],['empresas','Empresas']];
+  if (SECS[S.rol]) links.push(['panel', S.rol === 'ALUMNO' ? 'Mi panel' : S.rol === 'EMPRESA' ? 'Panel de empresa' : 'Administración']);
+  $('#nav').className = 'nav' + (S.menu ? ' open' : '');
+  $('#nav').innerHTML = links.map(([k,l]) => `<button class="${S.view === k || (k === 'ofertas' && S.view === 'oferta') || (k === 'empresas' && S.view === 'empresa') ? 'on' : ''}" data-go="${k}" ${k === 'panel' ? 'data-sec="dashboard"' : ''}>${l}</button>`).join('');
+  let who = '';
+  if (S.rol === 'ALUMNO') { const a = meAlumno(); who = `<span class="user-pill">${avatar(a,'sm')}<span class="uname">${esc(a.nombre)}</span></span>`; }
+  if (S.rol === 'EMPRESA') { const e = meEmpresa(); who = `<span class="user-pill">${elogoSm(e)}<span class="uname">${esc(e.nombre)}</span></span>`; }
+  if (S.rol === 'ADMIN') who = `<span class="user-pill"><span class="avatar sm" style="background:var(--fg);color:var(--bg)">${ic('shield','sm')}</span><span class="uname">Admin</span></span>`;
+  $('#topActions').innerHTML = S.rol === 'VISITANTE'
+    ? `<button class="btn btn-g" data-go="login">Iniciar sesión</button><button class="btn btn-p" data-go="registro">Registrarse</button>`
+    : `${who}<button class="btn btn-g icon-btn" data-act="logout" aria-label="Cerrar sesión" title="Cerrar sesión">${ic('logout')}</button>`;
+  $('#menuBtn').innerHTML = ic(S.menu ? 'x' : 'menu');
+  $('#roleSeg').innerHTML = [['VISITANTE','Visitante'],['ALUMNO','Alumno'],['EMPRESA','Empresa'],['ADMIN','Administrador']].map(([k,l]) => `<button class="${S.rol === k ? 'on' : ''}" data-act="asRole" data-id="${k}">${l}</button>`).join('');
+}
+function render(){
+  renderHeader();
+  const V = {inicio:vInicio, ofertas:vOfertas, oferta:vOferta, empresas:vEmpresas, empresa:vEmpresa, alumno:vAlumno, login:vLogin, registro:vRegistro, panel:vPanel}[S.view] || vNoEncontrado;
+  $('#app').innerHTML = V();
+  if (S.view === 'ofertas') renderResultados();
+}
+const hist = [];
+function go(view, id = null, sec = null){
+  hist.push({view:S.view, id:S.id, sec:S.sec});
+  S.view = view; S.id = id; S.menu = false; S.errors = {}; S.formVals = null;
+  if (sec) { S.sec = sec; if (sec !== 'procesos') S.draftFases = null; if (sec === 'crear') { S.draftTecs = null; S.editOferta = null; } if (sec !== 'perfil') S.pickCoords = null; }
+  render(); window.scrollTo(0, 0);
+}
+function login(rol, uid){
+  S.rol = rol; S.uid = uid; S.sec = 'dashboard'; S.draftFases = null; S.draftTecs = null; S.pickCoords = null;
+}
+
+/* ---------- Acciones ---------- */
+const A = {
+  asRole(id){ const m = {VISITANTE:null, ALUMNO:2, EMPRESA:10, ADMIN:1}; login(id, m[id]); go(id === 'VISITANTE' ? (S.view === 'panel' ? 'inicio' : S.view) : 'panel', S.id, 'dashboard'); toast(id === 'VISITANTE' ? 'Navegando como visitante' : `Sesión iniciada como ${nombreUsuario(usr(m[id]))}`); },
+  logout(){ login('VISITANTE', null); go('inicio'); toast('Has cerrado sesión'); },
+  back(){ const h = hist.pop(); if (h) { S.view = h.view; S.id = h.id; S.sec = h.sec; render(); window.scrollTo(0,0); } else go('inicio'); },
+  fav(id){
+    const a = meAlumno(); if (!a) return go('login');
+    const i = D.favoritos.findIndex(f => f.alumnoId === a.id && f.ofertaId == id);
+    if (i >= 0) { D.favoritos.splice(i,1); toast('Oferta eliminada de favoritos'); } else { D.favoritos.push({alumnoId:a.id, ofertaId:+id}); toast('Oferta guardada en favoritos'); }
+    render();
+  },
+  inscribir(id){
+    const o = ofe(id);
+    const fs = fasesDe(id);
+    modal('Confirmar inscripción', `<p>Vas a inscribirte en <b>${esc(o.titulo)}</b> de ${esc(emp(o.empresaId).nombre)}. La empresa podrá ver tu perfil${meAlumno().cv ? ' y tu currículum' : ''}.</p>
+      ${meAlumno().cv ? '' : `<div class="notice">${ic('info')}<span>No has subido tu currículum. Puedes inscribirte igualmente, pero te recomendamos añadirlo en “Mi perfil”.</span></div>`}
+      ${fs.length ? `<p class="muted" style="font-size:.88rem">El proceso tiene ${fs.length} fases y dura unos ${fs.reduce((s,f) => s + f.dias, 0)} días.</p>` : ''}
+      <div class="row" style="justify-content:flex-end"><button class="btn btn-g" data-act="closeModal">Cancelar</button><button class="btn btn-p" data-act="doInscribir" data-id="${id}">Confirmar inscripción</button></div>`);
+  },
+  doInscribir(id){
+    const a = meAlumno();
+    if (D.candidaturas.some(c => c.alumnoId === a.id && c.ofertaId == id)) { closeModal(); return toast('Ya estás inscrito en esta oferta', 'bad'); }
+    closeModal();
+    $('#app').querySelector('.apply-card').innerHTML = `<div class="loading"><span class="spin"></span> Enviando candidatura…</div>`;
+    setTimeout(() => { D.candidaturas.push({id:nextId(D.candidaturas), alumnoId:a.id, ofertaId:+id, fecha:HOY, estado:'ENVIADA'}); render(); toast('Candidatura enviada'); }, 600);
+  },
+  byCiclo(id){ S.f = {...S.f, ciclo:id, q:'', localidad:'', tecs:[]}; go('ofertas'); },
+  clearF(){ S.f = {q:'', ciclo:'', localidad:'', modalidad:'', remunerada:'', empresa:'', tecs:[], activas:true}; render(); },
+  toggleF(){ S.filtrosOpen = !S.filtrosOpen; $('.filters').classList.toggle('open', S.filtrosOpen); },
+  tecF(t, el){ const i = S.f.tecs.indexOf(t); i >= 0 ? S.f.tecs.splice(i,1) : S.f.tecs.push(t); el.classList.toggle('on'); el.setAttribute('aria-pressed', i < 0); renderResultados(); },
+  rmF(k){ if (k.startsWith('tec:')) S.f.tecs = S.f.tecs.filter(t => t !== k.slice(4)); else S.f[k] = ''; render(); },
+  mapSel(id){ S.mapSel = id ? +id : null; render(); },
+  verEnMapa(id){ S.mapSel = +id; S.mapLoc = ''; S.mapQ = ''; go('empresas'); },
+  ofertasEmpresa(id){ S.f = {q:'', ciclo:'', localidad:'', modalidad:'', remunerada:'', empresa:String(id), tecs:[], activas:true}; go('ofertas'); },
+  fillLogin(email){ $('#l-email').value = email; $('#l-pass').value = CRED; $('#l-pass').focus(); },
+  regTipo(_, el){ S.regTipo = el.value; S.errors = {}; render(); },
+  verCV(id){ cvModal(alu(id)); },
+  delCV(){ confirmModal('Eliminar currículum', 'Las empresas dejarán de poder consultarlo. ¿Quieres eliminarlo?', 'doDelCV', ''); },
+  doDelCV(){ meAlumno().cv = null; closeModal(); render(); toast('Currículum eliminado'); },
+  cvFile(_, el){
+    const f = el.files[0]; if (!f) return;
+    if (f.type !== 'application/pdf') { S.errors = {cv:'El archivo debe ser un PDF.'}; return render(); }
+    if (f.size > 5 * 1024 * 1024) { S.errors = {cv:'El archivo supera los 5 MB.'}; return render(); }
+    meAlumno().cv = f.name; S.errors = {}; render(); toast('Currículum subido');
+  },
+  newProj(){ projModal(null); },
+  editProj(id){ projModal(D.proyectos.find(p => p.id == id)); },
+  delProj(id){ const p = D.proyectos.find(x => x.id == id); confirmModal('Eliminar proyecto', `Se eliminará <b>${esc(p.titulo)}</b> de tu portfolio.`, 'doDelProj', id); },
+  doDelProj(id){ D.proyectos = D.proyectos.filter(p => p.id != id); closeModal(); render(); toast('Proyecto eliminado'); },
+  projTec(t, el){ el.classList.toggle('on'); el.setAttribute('aria-pressed', el.classList.contains('on')); },
+  projImgFile(_, el){
+    const f = el.files[0], e = $('#e-pr-img'); e.textContent = '';
+    if (!f) return;
+    if (!['image/png','image/jpeg','image/webp'].includes(f.type)) { el.value = ''; return e.textContent = 'Formato no permitido. Usa JPG, PNG o WebP.'; }
+    if (f.size > 2 * 1024 * 1024) { el.value = ''; return e.textContent = 'La imagen supera los 2 MB.'; }
+    const r = new FileReader(); r.onload = () => S.projImg = r.result; r.readAsDataURL(f);
+  },
+  delTec(t){ const a = meAlumno(); a.tecs = a.tecs.filter(x => x.t !== t); render(); toast(`${t} eliminada`); },
+  tecNivel(t, el){ const x = meAlumno().tecs.find(x => x.t === t); x.n = el.value; render(); toast('Nivel actualizado'); },
+  verFases(id){ const o = ofe(id); modal(`Proceso · ${esc(o.titulo)}`, procesoHTML(fasesDe(id))); },
+  valorar(id){ valorarModal(id); },
+  rate(n){ S.rating = +n; document.querySelectorAll('#rate button').forEach((b,i) => b.style.color = i < n ? 'var(--accent)' : ''); document.querySelectorAll('#rate svg').forEach((s,i) => s.classList.toggle('fill', i < n)); $('#e-rate').textContent = ''; },
+  closeModal(){ closeModal(); },
+  closeModalBg(_, el, ev){ if (ev.target === el) closeModal(); },
+  // Empresa
+  toggleActiva(id, el){ const o = ofe(id); o.activa = el.checked; render(); toast(o.activa ? 'Oferta activada' : 'Oferta desactivada'); },
+  editOferta(id){ S.editOferta = +id; S.draftTecs = null; go('panel', null, 'editar'); },
+  verCandidatos(id){ S.candOferta = String(id); go('panel', null, 'candidatos'); },
+  verProceso(id){ S.procOferta = +id; S.draftFases = null; go('panel', null, 'procesos'); },
+  delOferta(id){ const o = ofe(id), n = D.candidaturas.filter(c => c.ofertaId == id).length;
+    confirmModal('Eliminar oferta', `Se eliminará <b>${esc(o.titulo)}</b>${n ? ` junto con sus ${n} candidaturas, sus fases y los favoritos asociados` : ''}. Esta acción no se puede deshacer.${n ? '<br><br>Si solo quieres dejar de recibir candidatos, desactívala.' : ''}`, 'doDelOferta', id); },
+  doDelOferta(id){ id = +id; D.ofertas = D.ofertas.filter(o => o.id !== id); D.candidaturas = D.candidaturas.filter(c => c.ofertaId !== id); D.fases = D.fases.filter(f => f.ofertaId !== id); D.favoritos = D.favoritos.filter(f => f.ofertaId !== id); closeModal(); render(); toast('Oferta eliminada'); },
+  remToggle(_, el){ const s = $('#of-sal'); s.disabled = !el.checked; if (!el.checked) s.value = ''; },
+  tecAdd(){ const t = $('#of-tecsel').value; if (!t) return; keepForm(); S.draftTecs.push({t, ob:true}); render(); },
+  tecRm(i){ keepForm(); S.draftTecs.splice(+i,1); render(); },
+  tecOb(i, el){ S.draftTecs[+i].ob = el.checked; },
+  candOferta(_, el){ S.candOferta = el.value; render(); },
+  estadoCand(id, el){ const c = D.candidaturas.find(x => x.id == id); c.estado = el.value; render(); toast(`Candidatura marcada como ${c.estado}`); },
+  procOferta(_, el){ S.procOferta = +el.value; S.draftFases = null; S.errors = {}; render(); },
+  faseUp(i){ i = +i; const f = S.draftFases; [f[i-1], f[i]] = [f[i], f[i-1]]; render(); },
+  faseDown(i){ i = +i; const f = S.draftFases; [f[i+1], f[i]] = [f[i], f[i+1]]; render(); },
+  faseRm(i){ S.draftFases.splice(+i,1); render(); },
+  faseAdd(){ S.draftFases.push({id:null, ofertaId:S.procOferta, nombre:'', descripcion:'', dias:3, obligatoria:true}); render(); $(`#fn-${S.draftFases.length - 1}`)?.focus(); },
+  faseReset(){ S.draftFases = null; S.errors = {}; render(); toast('Cambios descartados'); },
+  // Admin
+  verificar(id){ emp(id).verificada = true; render(); toast(`${emp(id).nombre} verificada`); },
+  desverificar(id){ emp(id).verificada = false; render(); toast('Verificación retirada'); },
+  toggleUser(id){ const u = usr(id); u.activo = !u.activo; render(); toast(u.activo ? 'Cuenta activada' : 'Cuenta desactivada'); },
+  toggleActivaAdm(id){ const o = ofe(id); o.activa = !o.activa; render(); toast(o.activa ? 'Oferta activada' : 'Oferta desactivada'); },
+  valTab(k){ S.adminValTab = k; render(); },
+  modVal(id, el){ const v = D.valoraciones.find(x => x.id == id); v.estado = el.dataset.v; render(); toast(v.estado === 'APROBADA' ? 'Valoración aprobada y publicada' : 'Valoración rechazada'); }
+};
+function keepForm(){
+  const f = document.querySelector('form[data-form="oferta"]'); if (!f) return;
+  const fd = new FormData(f);
+  S.formVals = {titulo:fd.get('titulo'), descripcion:fd.get('descripcion'), ciclo:fd.get('ciclo'), localidad:fd.get('localidad'), plazas:fd.get('plazas'), modalidad:fd.get('modalidad'), remunerada:!!fd.get('remunerada'), salario:fd.get('salario') ?? '', limite:fd.get('limite'), activa:!!fd.get('activa')};
+}
+
+/* ---------- Formularios ---------- */
+const isEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+const isUrl = s => /^https?:\/\/\S+\.\S+/.test(s);
+const F = {
+  heroSearch(fd){ S.f = {q:fd.get('q').trim(), ciclo:'', localidad:fd.get('localidad'), modalidad:'', remunerada:'', empresa:'', tecs:[], activas:true}; go('ofertas'); },
+  login(fd){
+    const email = fd.get('email').trim().toLowerCase(), pass = fd.get('pass'), e = {};
+    if (!isEmail(email)) e.email = 'Introduce un correo válido.';
+    if (!pass) e.pass = 'Introduce tu contraseña.';
+    S.errors = e; if (Object.keys(e).length) return render();
+    S.loading = true; render(); $('#l-email').value = email;
+    setTimeout(() => {
+      S.loading = false;
+      const u = D.usuarios.find(u => u.email === email);
+      if (!u || (pass !== CRED && pass !== u.pass)) { S.errors = {login:'Correo o contraseña incorrectos.'}; render(); $('#l-email').value = email; return; }
+      if (!u.activo) { S.errors = {login:'Esta cuenta está desactivada. Contacta con el administrador.'}; render(); return; }
+      login(u.rol, u.id); go('panel', null, 'dashboard'); toast(`Bienvenido/a, ${nombreUsuario(u)}`);
+    }, 700);
+  },
+  registro(fd){
+    const t = fd.get('tipo'), e = {}, email = fd.get('email').trim().toLowerCase();
+    if (!fd.get('nombre').trim()) e.nombre = 'Campo obligatorio.';
+    if (t === 'ALUMNO' && !fd.get('apellidos').trim()) e.apellidos = 'Campo obligatorio.';
+    if (t === 'EMPRESA' && !fd.get('localidad').trim()) e.localidad = 'Campo obligatorio.';
+    if (!isEmail(email)) e.email = 'Introduce un correo válido.';
+    else if (D.usuarios.some(u => u.email === email)) e.email = 'Ya existe una cuenta con este correo.';
+    if ((fd.get('pass') || '').length < 8) e.pass = 'La contraseña debe tener al menos 8 caracteres.';
+    if (fd.get('pass') !== fd.get('pass2')) e.pass2 = 'Las contraseñas no coinciden.';
+    S.errors = e;
+    if (Object.keys(e).length) { const vals = Object.fromEntries(fd); render(); Object.entries(vals).forEach(([k,v]) => { const el = document.querySelector(`[name="${k}"]:not([type=radio])`); if (el && !el.type.includes('password')) el.value = v; }); return; }
+    const uid = nextId(D.usuarios);
+    D.usuarios.push({id:uid, email, rol:t, activo:true, alta:HOY, pass:fd.get('pass')});
+    if (t === 'ALUMNO') D.alumnos.push({id:nextId(D.alumnos), usuarioId:uid, nombre:fd.get('nombre').trim(), apellidos:fd.get('apellidos').trim(), ciclo:fd.get('ciclo'), curso:'1º', centro:'', localidad:'', descripcion:'', cv:null, tecs:[], color:PALETA[uid % PALETA.length]});
+    else D.empresas.push({id:nextId(D.empresas), usuarioId:uid, nombre:fd.get('nombre').trim(), localidad:fd.get('localidad').trim(), direccion:'', lat:40.4168, lng:-3.7038, verificada:false, web:'', telefono:'', descripcion:'', color:PALETA[uid % PALETA.length]});
+    login(t, uid); go('panel', null, 'perfil'); toast('Cuenta creada. Completa tu perfil.');
+  },
+  perfilAlumno(fd){
+    const e = {}; ['nombre','apellidos','centro','localidad'].forEach(k => { if (!fd.get(k).trim()) e[k] = 'Campo obligatorio.'; });
+    S.errors = e; if (Object.keys(e).length) return render();
+    const a = meAlumno(); ['nombre','apellidos','ciclo','curso','centro','localidad','descripcion'].forEach(k => a[k] = fd.get(k).trim());
+    render(); toast('Perfil actualizado');
+  },
+  addTec(fd){ meAlumno().tecs.push({t:fd.get('t'), n:fd.get('n')}); render(); toast(`${fd.get('t')} añadida`); },
+  proyecto(fd, form){
+    let ok = true; const setE = (id, m) => { $('#' + id).textContent = m; if (m) ok = false; };
+    setE('e-pr-t', fd.get('titulo').trim() ? '' : 'El título es obligatorio.');
+    setE('e-pr-d', fd.get('descripcion').trim() ? '' : 'La descripción es obligatoria.');
+    setE('e-pr-gh', !fd.get('github') || isUrl(fd.get('github')) ? '' : 'Introduce una URL válida (https://…).');
+    setE('e-pr-demo', !fd.get('demo') || isUrl(fd.get('demo')) ? '' : 'Introduce una URL válida (https://…).');
+    if (!ok) return;
+    const tecs = [...document.querySelectorAll('#pr-tecs button.on')].map(b => b.dataset.id);
+    const data = {titulo:fd.get('titulo').trim(), descripcion:fd.get('descripcion').trim(), github:fd.get('github').trim(), demo:fd.get('demo').trim(), fecha:fd.get('fecha') || HOY, tecs, img:S.projImg || null};
+    const id = form.dataset.id;
+    if (id) Object.assign(D.proyectos.find(p => p.id == id), data);
+    else D.proyectos.push({id:nextId(D.proyectos), alumnoId:meAlumno().id, color:PALETA[D.proyectos.length % PALETA.length], ...data});
+    closeModal(); render(); toast(id ? 'Proyecto actualizado' : 'Proyecto añadido al portfolio');
+  },
+  valorar(fd, form){
+    const com = fd.get('comentario').trim(); let ok = true;
+    if (!S.rating) { $('#e-rate').textContent = 'Elige una puntuación del 1 al 5.'; ok = false; }
+    if (com.length < 10) { $('#e-vcom').textContent = 'Escribe al menos 10 caracteres.'; ok = false; } else $('#e-vcom').textContent = '';
+    if (!ok) return;
+    D.valoraciones.push({id:nextId(D.valoraciones), empresaId:+form.dataset.id, alumnoId:meAlumno().id, puntuacion:S.rating, comentario:com, fecha:HOY, estado:'PENDIENTE'});
+    closeModal(); render(); toast('Valoración enviada. Se publicará tras la moderación.');
+  },
+  cfgEmail(fd){
+    const email = fd.get('email').trim().toLowerCase(), u = usr(S.uid);
+    S.errors = {}; if (!isEmail(email)) S.errors.cemail = 'Introduce un correo válido.';
+    else if (D.usuarios.some(x => x.email === email && x.id !== u.id)) S.errors.cemail = 'Ese correo ya está en uso.';
+    if (S.errors.cemail) return render();
+    u.email = email; render(); toast('Correo actualizado');
+  },
+  cfgPass(fd){
+    const u = usr(S.uid), e = {};
+    if (fd.get('p0') !== (u.pass || CRED)) e.p0 = 'La contraseña actual no es correcta.';
+    if (fd.get('p1').length < 8) e.p1 = 'Mínimo 8 caracteres.';
+    if (fd.get('p1') !== fd.get('p2')) e.p2 = 'No coincide.';
+    S.errors = e; if (Object.keys(e).length) return render();
+    u.pass = fd.get('p1'); render(); toast('Contraseña cambiada');
+  },
+  perfilEmpresa(fd){
+    const e = {}, lat = parseFloat(fd.get('lat')), lng = parseFloat(fd.get('lng'));
+    ['nombre','localidad','direccion'].forEach(k => { if (!fd.get(k).trim()) e[k] = 'Campo obligatorio.'; });
+    if (fd.get('web') && !isUrl(fd.get('web'))) e.web = 'Introduce una URL válida (https://…).';
+    if (fd.get('telefono') && !/^[+\d\s]{9,15}$/.test(fd.get('telefono'))) e.telefono = 'Teléfono no válido.';
+    if (isNaN(lat) || lat < -90 || lat > 90) e.lat = 'Debe estar entre -90 y 90.';
+    if (isNaN(lng) || lng < -180 || lng > 180) e.lng = 'Debe estar entre -180 y 180.';
+    S.errors = e; if (Object.keys(e).length) return render();
+    const em = meEmpresa(); ['nombre','web','telefono','localidad','direccion','descripcion'].forEach(k => em[k] = fd.get(k).trim()); em.lat = lat; em.lng = lng; S.pickCoords = null;
+    render(); toast('Perfil de empresa actualizado');
+  },
+  oferta(fd){
+    keepForm(); const v = S.formVals, e = {};
+    if (!v.titulo.trim()) e.titulo = 'El título es obligatorio.';
+    if (v.descripcion.trim().length < 20) e.descripcion = 'Describe la oferta (mínimo 20 caracteres).';
+    if (!v.localidad.trim()) e.localidad = 'La localidad es obligatoria.';
+    if (!(+v.plazas > 0) || !Number.isInteger(+v.plazas)) e.plazas = 'Debe ser un número entero mayor que 0.';
+    if (v.remunerada && (v.salario === '' || +v.salario < 0)) e.salario = 'Indica un salario igual o mayor que 0.';
+    if (!v.limite) e.limite = 'Indica la fecha límite.'; else if (v.limite < HOY) e.limite = 'La fecha no puede ser anterior a hoy.';
+    if (!S.draftTecs.length) e.tecs = 'Añade al menos una tecnología.';
+    S.errors = e; if (Object.keys(e).length) { render(); toast('Revisa los campos marcados', 'bad'); return; }
+    const data = {titulo:v.titulo.trim(), descripcion:v.descripcion.trim(), ciclo:v.ciclo, localidad:v.localidad.trim(), modalidad:v.modalidad, remunerada:v.remunerada, salario:v.remunerada ? +v.salario : null, plazas:+v.plazas, limite:v.limite, activa:v.activa, tecs:S.draftTecs.map(t => ({...t}))};
+    if (S.sec === 'editar') { Object.assign(ofe(S.editOferta), data); toast('Oferta actualizada'); }
+    else { const id = nextId(D.ofertas); D.ofertas.push({id, empresaId:meEmpresa().id, publicada:HOY, ...data}); toast('Oferta publicada. Ahora puedes definir su proceso de selección.'); }
+    S.draftTecs = null; S.formVals = null; go('panel', null, 'ofertas');
+  },
+  fases(){
+    const e = {}; S.draftFases.forEach((f,i) => { if (!f.nombre.trim()) e['fn' + i] = 'Pon un nombre a la fase.'; if (f.dias === '' || +f.dias < 0) e['fdias' + i] = 'Mínimo 0.'; });
+    S.errors = e; if (Object.keys(e).length) return render();
+    D.fases = D.fases.filter(f => f.ofertaId != S.procOferta);
+    let id = nextId(D.fases);
+    S.draftFases.forEach((f,i) => D.fases.push({...f, id:id++, ofertaId:S.procOferta, orden:i + 1, dias:+f.dias}));
+    S.draftFases = null; render(); toast('Proceso de selección guardado');
+  }
+};
+
+/* ---------- Eventos ---------- */
+document.addEventListener('click', ev => {
+  if (ev.target.classList?.contains('modal-bg')) { closeModal(); return; }
+  const a = ev.target.closest('[data-act]');
+  if (a && !['SELECT','INPUT'].includes(a.tagName)) { ev.preventDefault?.(); if (a.tagName === 'A') return; A[a.dataset.act]?.(a.dataset.id, a, ev); return; }
+  if (a && a.type === 'radio') { A[a.dataset.act]?.(a.dataset.id, a, ev); return; }
+  const g = ev.target.closest('[data-go]');
+  if (g) { if (g.dataset.tipo) S.regTipo = g.dataset.tipo; else if (g.dataset.go === 'registro') S.regTipo = S.regTipo || 'ALUMNO'; go(g.dataset.go, g.dataset.id ? +g.dataset.id : null, g.dataset.sec || null); return; }
+  const svg = ev.target.closest('svg[data-pick]');
+  if (svg) {
+    const r = svg.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * MAP.w, y = (ev.clientY - r.top) / r.height * MAP.h;
+    const [lat, lng] = unproj(x, y); S.pickCoords = {lat:+lat.toFixed(4), lng:+lng.toFixed(4)};
+    const keep = Object.fromEntries(new FormData(document.querySelector('form[data-form="perfilEmpresa"]')));
+    render(); Object.entries(keep).forEach(([k,v]) => { if (k !== 'lat' && k !== 'lng') { const el = document.querySelector(`[name="${k}"]`); if (el) el.value = v; } });
+  }
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && $('#modalRoot').innerHTML) closeModal();
+  if (ev.key === 'Enter' && ev.target.matches?.('.ocard, .mk')) ev.target.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.dataset.act && ['SELECT','INPUT'].includes(t.tagName) && t.type !== 'radio') { A[t.dataset.act]?.(t.dataset.id, t, ev); return; }
+  if (t.dataset.filter) { S.f[t.dataset.filter] = t.type === 'checkbox' ? t.checked : t.value; renderResultados(); }
+  if (t.dataset.mapf === 'loc') { S.mapLoc = t.value; S.mapSel = null; render(); }
+  if (t.dataset.adminf === 'rol') { S.adminUserRol = t.value; render(); }
+  if (t.dataset.fase !== undefined && t.type === 'checkbox') S.draftFases[+t.dataset.fase].obligatoria = t.checked;
+});
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t.dataset.filter === 'q') { S.f.q = t.value; renderResultados(); }
+  if (t.dataset.mapf === 'q') { S.mapQ = t.value; const pos = t.selectionStart; render(); const n = $('#m-q'); n.focus(); n.setSelectionRange(pos, pos); }
+  if (t.dataset.adminf === 'q') { S.adminUserQ = t.value; const pos = t.selectionStart; render(); const n = $('#au-q'); n.focus(); n.setSelectionRange(pos, pos); }
+  if (t.dataset.fase !== undefined && t.type !== 'checkbox') { S.draftFases[+t.dataset.fase][t.dataset.k] = t.value; if (t.dataset.k === 'dias') { const tot = S.draftFases.reduce((s,f) => s + (+f.dias || 0), 0); const b = t.closest('form').querySelector('.row.between b'); if (b) b.textContent = tot + ' días'; } }
+});
+document.addEventListener('submit', ev => {
+  const f = ev.target.closest('form[data-form]'); if (!f) return;
+  ev.preventDefault(); F[f.dataset.form]?.(new FormData(f), f);
+});
+$('#menuBtn').addEventListener('click', () => { S.menu = !S.menu; renderHeader(); });
+
+render();
+</script>
