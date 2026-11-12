@@ -86,15 +86,15 @@ docker compose version
 El repositorio es privado, así que necesitas un **token de GitHub de solo lectura**:
 
 1. En GitHub: **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
-2. **Repository access**: *Only select repositories* → `PractiFP`. **Permissions → Contents**: *Read-only*. Genera el token y cópialo.
+2. **Repository access**: *Only select repositories* → `PractiFP-web`. **Permissions → Contents**: *Read-only*. Genera el token y cópialo.
 3. En el servidor:
 
 ```bash
-git clone https://TU_TOKEN@github.com/ceta21/PractiFP.git
-cd PractiFP
+git clone https://TU_TOKEN@github.com/PractiFP/PractiFP-web.git
+cd PractiFP-web
 ```
 
-(Si haces el repositorio público, basta con `git clone https://github.com/ceta21/PractiFP.git`).
+(Si haces el repositorio público, basta con `git clone https://github.com/PractiFP/PractiFP-web.git`).
 
 ## 7. Configurar
 
@@ -161,7 +161,7 @@ docker compose logs caddy
 **Actualizar** a la última versión del código:
 
 ```bash
-cd ~/PractiFP
+cd ~/PractiFP-web
 git pull
 docker compose up -d --build
 ```
@@ -169,12 +169,12 @@ docker compose up -d --build
 **Copias de seguridad** (base de datos y archivos subidos):
 
 ```bash
-cd ~/PractiFP
+cd ~/PractiFP-web
 docker compose exec db sh -c 'mariadb-dump -u root -p"$MARIADB_ROOT_PASSWORD" practifp' > copia-$(date +%F).sql
 docker run --rm -v practifp_archivos:/datos -v "$PWD":/copia alpine tar czf /copia/archivos-$(date +%F).tgz -C /datos .
 ```
 
-Descárgalas a tu ordenador con `scp -i ruta/a/ssh-key.key ubuntu@IP:~/PractiFP/copia-*.sql .`.
+Descárgalas a tu ordenador con `scp -i ruta/a/ssh-key.key ubuntu@IP:~/PractiFP-web/copia-*.sql .`.
 
 **Restaurar** una copia de la base de datos:
 

@@ -1,5 +1,6 @@
 # Despliegue completo de PractiFP: base de datos, aplicación y HTTPS automático.
 # Uso:  cp .env.produccion.example .env   (y rellénalo)   →   docker compose up -d --build
+name: practifp
 services:
   db:
     image: mariadb:11.4
