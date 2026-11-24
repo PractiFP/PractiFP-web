@@ -1,0 +1,72 @@
+# Pruebas automáticas: se ejecutan en cada push y en cada pull request.
+# Si algo falla, GitHub marca el commit con una cruz roja y lo avisa por correo.
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: API (archivos en ${{ matrix.almacen }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # disco: como en un servidor con Docker; bd: como en Vercel (archivos dentro de la base de datos)
+        almacen: [disco, bd]
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: raiz-solo-para-pruebas
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: raiz-solo-para-pruebas
+      DB_NAME: practifp
+      JWT_SECRET: secreto-de-pruebas-de-integracion-continua-0123456789
+      ALMACEN_ARCHIVOS: ${{ matrix.almacen }}
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: Dependencias sin vulnerabilidades conocidas
+        run: npm audit --omit=dev --audit-level=high
+
+  frontend:
+    name: Web (compilación)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Dependencias sin vulnerabilidades conocidas
+        run: npm audit --omit=dev --audit-level=high
