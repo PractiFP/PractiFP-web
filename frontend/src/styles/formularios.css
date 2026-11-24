@@ -65,3 +65,8 @@ textarea.entrada { resize: vertical; min-height: 110px; line-height: 1.5; }
 .interruptor input:checked + span::after { transform: translateX(18px); }
 .interruptor input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
 .interruptor input:disabled + span { opacity: .5; }
+
+/* Enlace "¿Has olvidado tu contraseña?" y casilla de la política de privacidad */
+.auth__enlace { margin: -6px 0 0; font-size: .9rem; text-align: right; }
+.casilla--legal { align-items: flex-start; line-height: 1.45; }
+.casilla--legal input { margin-top: 3px; }

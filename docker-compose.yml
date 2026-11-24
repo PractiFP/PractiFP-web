@@ -34,6 +34,12 @@ services:
       JWT_EXPIRES_IN: 8h
       FRONTEND_URL: https://${DOMINIO}
       TRUST_PROXY: 1
+      # Correo para recuperar la contraseña (opcional; ver .env.produccion.example)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     volumes:
       - archivos:/datos/uploads
 

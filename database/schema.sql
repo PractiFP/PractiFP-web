@@ -38,6 +38,8 @@ CREATE TABLE USUARIOS (
   rol             ENUM('ALUMNO','EMPRESA','ADMIN') NOT NULL,
   activo          BOOLEAN      NOT NULL DEFAULT TRUE,
   fecha_registro  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  privacidad_aceptada DATETIME NULL,              -- cuándo aceptó la política de privacidad al registrarse
+  sesiones_desde  INT UNSIGNED NULL,              -- segundos Unix: los tokens emitidos antes ya no valen (cambio de contraseña)
   CONSTRAINT uq_usuarios_email UNIQUE (email)
 ) ENGINE=InnoDB;
 
@@ -212,4 +214,26 @@ CREATE TABLE ARCHIVOS (
   contenido  LONGBLOB     NOT NULL,
   tamano     INT UNSIGNED NOT NULL,
   fecha      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Enlaces para restablecer la contraseña. Solo se guarda el hash SHA-256 del enlace,
+-- así que quien lea la base de datos no puede usarlos. Se borran al usarse.
+CREATE TABLE RECUPERACIONES (
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  usuario_id  INT UNSIGNED NOT NULL,
+  token_hash  CHAR(64)     NOT NULL,
+  caduca      DATETIME     NOT NULL,
+  fecha       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_recuperaciones_token UNIQUE (token_hash),
+  CONSTRAINT fk_recup_usuario FOREIGN KEY (usuario_id) REFERENCES USUARIOS(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Contador de intentos para limitar la fuerza bruta (inicio de sesión, registro...).
+-- Se guarda en la base de datos para que funcione aunque haya varias copias del servidor (Vercel).
+-- La clave es un hash del límite y la IP: no se guardan direcciones IP.
+CREATE TABLE INTENTOS (
+  clave  CHAR(64)     PRIMARY KEY,
+  n      INT UNSIGNED NOT NULL,
+  hasta  DATETIME     NOT NULL,
+  INDEX ix_intentos_hasta (hasta)
 ) ENGINE=InnoDB;

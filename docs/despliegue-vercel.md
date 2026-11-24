@@ -97,11 +97,37 @@ Por seguridad solo funciona con el token correcto y si la base de datos todavía
    | `JWT_EXPIRES_IN` | `8h` |
    | `NODE_ENV` | `production` |
    | `TRUST_PROXY` | `1` |
+   | `FRONTEND_URL` | la dirección pública de la web, por ejemplo `https://practifp.vercel.app` (los correos de recuperación enlazan aquí) |
 
 5. Pulsa **Deploy**. En uno o dos minutos tendrás la web en una dirección como `https://practifp-xxxx.vercel.app`.
 6. Comprueba que funciona abriendo `https://TU-DIRECCION.vercel.app/api/salud`: debe indicar `"conectada": true`.
 
 Desde ese momento, **cada `git push` a `main` vuelve a desplegar la web automáticamente**.
+
+### Correo para recuperar la contraseña
+
+Para que funcione «¿Has olvidado tu contraseña?» hace falta un servidor de correo (SMTP). Sin él, la web avisa de que esa opción no está disponible. Una opción gratuita es **Brevo** (300 correos al día, sin tarjeta):
+
+1. Regístrate en <https://www.brevo.com>.
+2. En **Senders, Domains & Dedicated IPs → Senders**, añade y verifica el correo que aparecerá como remitente (te llega un correo de confirmación).
+3. En **SMTP & API → SMTP**, pulsa **Generate a new SMTP key** y apunta el *Login* y la clave.
+4. En Vercel, añade estas variables y vuelve a desplegar:
+
+   | Nombre | Valor |
+   |---|---|
+   | `SMTP_HOST` | `smtp-relay.brevo.com` |
+   | `SMTP_PORT` | `587` |
+   | `SMTP_USER` | el *Login* de Brevo |
+   | `SMTP_PASS` | la clave SMTP (márcala como *Sensitive*) |
+   | `SMTP_FROM` | `PractiFP <el-correo-que-verificaste@ejemplo.es>` |
+
+   Recuerda tener también `FRONTEND_URL` (tabla anterior).
+
+También sirve una cuenta de Gmail con una [contraseña de aplicación](https://support.google.com/accounts/answer/185833) (`smtp.gmail.com`, puerto `587`), aunque Gmail limita los envíos diarios.
+
+### Actualizaciones de la base de datos
+
+Cuando una versión nueva añade tablas o columnas, **la API las crea sola** en la primera petición después del despliegue (solo añade, nunca borra datos). No hay que ejecutar nada.
 
 ### Cambiar la dirección (opcional)
 

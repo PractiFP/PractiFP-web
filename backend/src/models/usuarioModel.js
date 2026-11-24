@@ -14,15 +14,26 @@ export async function existeEmail(email) {
   return Boolean(fila);
 }
 
-export async function crear(conn, { email, passwordHash, rol }) {
-  const r = await conn.query('INSERT INTO USUARIOS (email, password_hash, rol) VALUES (?, ?, ?)', [email, passwordHash, rol]);
+export async function crear(conn, { email, passwordHash, rol, aceptaPrivacidad = false }) {
+  const r = await conn.query(
+    `INSERT INTO USUARIOS (email, password_hash, rol, privacidad_aceptada) VALUES (?, ?, ?, ${aceptaPrivacidad ? 'NOW()' : 'NULL'})`,
+    [email, passwordHash, rol]
+  );
   return r.insertId;
 }
 
 /** Datos de sesión: usuario + nombre visible y perfil según su rol. */
 export async function obtenerSesion(id) {
+  return (await leerSesion(id))?.sesion ?? null;
+}
+
+/**
+ * Como obtenerSesion, pero devuelve también `sesionesDesde` (segundos Unix): los tokens
+ * emitidos antes de ese momento ya no son válidos. Es un dato interno que no se envía al navegador.
+ */
+export async function leerSesion(id) {
   const [fila] = await query(
-    `SELECT u.id, u.email, u.rol, u.activo, u.fecha_registro AS fechaRegistro,
+    `SELECT u.id, u.email, u.rol, u.activo, u.fecha_registro AS fechaRegistro, u.sesiones_desde AS sesionesDesde,
             a.id AS alumnoId, a.nombre AS alumnoNombre, a.apellidos AS alumnoApellidos, c.codigo AS ciclo,
             e.id AS empresaId, e.nombre AS empresaNombre, e.verificada
        FROM USUARIOS u
@@ -42,7 +53,7 @@ export async function obtenerSesion(id) {
   } else {
     Object.assign(sesion, { nombre: 'Administración', nombreCorto: 'Admin' });
   }
-  return sesion;
+  return { sesion, sesionesDesde: fila.sesionesDesde ?? 0 };
 }
 
 export async function obtenerHash(id) {
@@ -54,6 +65,23 @@ export async function actualizarEmail(id, email) {
   await query('UPDATE USUARIOS SET email = ? WHERE id = ?', [email, id]);
 }
 
-export async function actualizarPassword(id, passwordHash) {
-  await query('UPDATE USUARIOS SET password_hash = ? WHERE id = ?', [passwordHash, id]);
+/**
+ * Cambia la contraseña y cierra todas las sesiones abiertas: los tokens emitidos
+ * antes de este momento dejan de valer. Devuelve ese momento (segundos Unix).
+ */
+export async function actualizarPassword(id, passwordHash, conn = null) {
+  const ahora = Math.floor(Date.now() / 1000);
+  await (conn ?? { query }).query('UPDATE USUARIOS SET password_hash = ?, sesiones_desde = ? WHERE id = ?', [passwordHash, ahora, id]);
+  return ahora;
+}
+
+/** Elimina la cuenta. Sus datos (perfil, ofertas, candidaturas...) se borran en cascada. */
+export async function eliminar(id) {
+  const r = await query('DELETE FROM USUARIOS WHERE id = ?', [id]);
+  return r.affectedRows > 0;
+}
+
+export async function contarAdminsActivos() {
+  const [fila] = await query("SELECT COUNT(*) AS n FROM USUARIOS WHERE rol = 'ADMIN' AND activo = TRUE");
+  return fila.n;
 }

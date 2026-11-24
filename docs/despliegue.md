@@ -112,6 +112,8 @@ Rellena:
   openssl rand -hex 32
   ```
 
+- Opcional: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` y `SMTP_FROM` para que funcione «¿Has olvidado tu contraseña?» (por ejemplo, con Brevo, gratis: ver `docs/despliegue-vercel.md`, apartado «Correo para recuperar la contraseña»).
+
 Guarda con `Ctrl+O`, `Enter` y sal con `Ctrl+X`.
 
 ## 8. Arrancar
@@ -165,6 +167,8 @@ cd ~/PractiFP-web
 git pull
 docker compose up -d --build
 ```
+
+Si la versión nueva añade tablas o columnas, la aplicación las crea sola al arrancar (solo añade, nunca borra datos).
 
 **Copias de seguridad** (base de datos y archivos subidos):
 

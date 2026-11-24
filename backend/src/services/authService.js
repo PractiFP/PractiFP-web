@@ -16,7 +16,7 @@ const HASH_FICTICIO = bcrypt.hashSync('hash-ficticio-practifp', COSTE_BCRYPT);
 
 export const PASSWORD_MIN = 8;
 
-function firmarToken(usuario) {
+export function firmarToken(usuario) {
   return jwt.sign({ rol: usuario.rol }, env.jwt.secret, { subject: String(usuario.id), expiresIn: env.jwt.expiresIn, algorithm: 'HS256' });
 }
 
@@ -46,6 +46,10 @@ export async function registrar(cuerpo = {}) {
     ? { localidad: [reglas.requerido(), reglas.longitudMax(100)] }
     : { apellidos: [reglas.requerido(), reglas.longitudMax(120)], cicloId: [reglas.requerido('Elige tu ciclo formativo.'), reglas.enteroPositivo('Ciclo no válido.')] };
   validar(datos, { ...comunes, ...especificos });
+  // RGPD: el consentimiento tiene que ser expreso (una casilla marcada por el usuario)
+  if (cuerpo.aceptaPrivacidad !== true) {
+    throw new HttpError(400, 'Revisa los datos del formulario.', { aceptaPrivacidad: 'Debes aceptar la política de privacidad para crear la cuenta.' });
+  }
 
   if (datos.tipo === 'ALUMNO' && !(await Ciclo.existe(datos.cicloId))) {
     throw new HttpError(400, 'Revisa los datos del formulario.', { cicloId: 'El ciclo elegido no existe.' });
@@ -58,7 +62,7 @@ export async function registrar(cuerpo = {}) {
 
   // Usuario y perfil se crean juntos: si falla uno, no se crea ninguno
   const id = await transaction(async (conn) => {
-    const usuarioId = await Usuario.crear(conn, { email: datos.email, passwordHash, rol: datos.tipo });
+    const usuarioId = await Usuario.crear(conn, { email: datos.email, passwordHash, rol: datos.tipo, aceptaPrivacidad: true });
     if (datos.tipo === 'ALUMNO') {
       await Alumno.crear(conn, { usuarioId, nombre: datos.nombre, apellidos: datos.apellidos, cicloId: Number(datos.cicloId) });
     } else {

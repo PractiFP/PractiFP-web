@@ -4,6 +4,7 @@
 erDiagram
     USUARIOS ||--o| ALUMNOS : "tiene perfil"
     USUARIOS ||--o| EMPRESAS : "tiene perfil"
+    USUARIOS ||--o{ RECUPERACIONES : "pide"
     CICLOS ||--o{ ALUMNOS : "cursa"
     CICLOS ||--o{ OFERTAS : "requiere"
     EMPRESAS ||--o{ OFERTAS : "publica"
@@ -30,6 +31,15 @@ erDiagram
         enum rol "ALUMNO | EMPRESA | ADMIN"
         boolean activo
         datetime fecha_registro
+        datetime privacidad_aceptada
+        int sesiones_desde
+    }
+    RECUPERACIONES {
+        int id PK
+        int usuario_id FK
+        char token_hash UK
+        datetime caduca
+        datetime fecha
     }
     CICLOS {
         int id PK

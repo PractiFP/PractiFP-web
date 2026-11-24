@@ -8,6 +8,9 @@ import Inicio from './pages/Inicio.jsx';
 import Login from './pages/Login.jsx';
 import Registro from './pages/Registro.jsx';
 import NoEncontrada from './pages/NoEncontrada.jsx';
+import RecuperarPassword from './pages/RecuperarPassword.jsx';
+import RestablecerPassword from './pages/RestablecerPassword.jsx';
+import Privacidad from './pages/Privacidad.jsx';
 import IrAlPanel from './pages/panel/IrAlPanel.jsx';
 import DashboardAlumno from './pages/panel/DashboardAlumno.jsx';
 import DashboardEmpresa from './pages/panel/DashboardEmpresa.jsx';
@@ -45,9 +48,12 @@ export default function App() {
         <Route path="/empresas" element={<Empresas />} />
         <Route path="/empresas/:id" element={<DetalleEmpresa />} />
         <Route path="/alumnos/:id" element={<PerfilAlumno />} />
+        <Route path="/privacidad" element={<Privacidad />} />
+        <Route path="/restablecer-contrasena" element={<RestablecerPassword />} />
         <Route element={<SoloInvitados />}>
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/recuperar-contrasena" element={<RecuperarPassword />} />
         </Route>
 
         {/* /panel lleva al panel del rol del usuario */}

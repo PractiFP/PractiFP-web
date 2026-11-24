@@ -16,7 +16,7 @@ if (process.env.JWT_SECRET.length < 32 || process.env.JWT_SECRET === 'cambia_est
 export const env = {
   port: Number(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, ''),
   // Número de proxies inversos delante del servidor (Nginx, etc.), para obtener la IP real del cliente
   trustProxy: Number(process.env.TRUST_PROXY) || 0,
   // En producción, el backend sirve también el frontend compilado (frontend/dist)
@@ -31,6 +31,17 @@ export const env = {
     // DB_SSL=true: conexión cifrada verificando el certificado del servidor (obligatorio en TiDB Cloud)
     ...(process.env.DB_SSL === 'true' ? { ssl: { rejectUnauthorized: true } } : {}),
   },
+  // Correo saliente (SMTP) para los enlaces de recuperación de contraseña.
+  // Sin SMTP_HOST: en desarrollo el enlace se muestra en la consola; en producción la función se desactiva.
+  correo: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT) || 587,
+    usuario: process.env.SMTP_USER || '',
+    password: process.env.SMTP_PASS || '',
+    remitente: process.env.SMTP_FROM || '',
+  },
+  // true si FRONTEND_URL está definida (los enlaces de los correos deben apuntar a la web real)
+  frontendUrlDefinida: Boolean(process.env.FRONTEND_URL),
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '8h',

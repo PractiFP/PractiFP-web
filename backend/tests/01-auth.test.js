@@ -29,19 +29,19 @@ describe('Registro', () => {
     for (const campo of ['email', 'password', 'nombre', 'apellidos', 'cicloId']) assert.ok(r.error.detalles[campo], campo);
   });
   it('registra un alumno con su perfil y devuelve un token', async () => {
-    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'ALUMNO', email: 'Nuevo@Correo.example', password: 'secreta123', nombre: 'Nuevo', apellidos: 'Alumno', cicloId: 2 } });
+    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'ALUMNO', email: 'Nuevo@Correo.example', password: 'secreta123', nombre: 'Nuevo', apellidos: 'Alumno', cicloId: 2, aceptaPrivacidad: true } });
     assert.equal(r.status, 201);
     assert.ok(r.data.token);
     assert.equal(r.data.usuario.email, 'nuevo@correo.example');
     assert.equal(r.data.usuario.ciclo, 'DAW');
   });
   it('registra una empresa sin verificar', async () => {
-    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'EMPRESA', email: 'empresa@nueva.example', password: 'secreta123', nombre: 'Nueva SL', localidad: 'Soria' } });
+    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'EMPRESA', email: 'empresa@nueva.example', password: 'secreta123', nombre: 'Nueva SL', localidad: 'Soria', aceptaPrivacidad: true } });
     assert.equal(r.status, 201);
     assert.equal(r.data.usuario.verificada, false);
   });
   it('no permite un correo repetido', async () => {
-    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'EMPRESA', email: CUENTAS.lucia, password: 'secreta123', nombre: 'X', localidad: 'Y' } });
+    const r = await api('POST', '/auth/registro', { cuerpo: { tipo: 'EMPRESA', email: CUENTAS.lucia, password: 'secreta123', nombre: 'X', localidad: 'Y', aceptaPrivacidad: true } });
     assert.equal(r.status, 409);
     assert.ok(r.error.detalles.email);
   });

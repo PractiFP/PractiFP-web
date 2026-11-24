@@ -8,7 +8,7 @@ Plataforma web que conecta a estudiantes de Formación Profesional (DAM, DAW, AS
 
 > **Web publicada**: <https://practifp.vercel.app> (Vercel + TiDB Cloud, con datos de prueba; contraseña de las cuentas de prueba: `practifp123`).
 >
-> Estado actual: **las 8 fases están completadas**. Incluye 69 pruebas automáticas de la API (`npm test`), revisión de seguridad y de accesibilidad, y modo de producción.
+> Estado actual: **las 8 fases están completadas**, además de recuperación de contraseña por correo, adaptación al RGPD (política de privacidad, descarga y borrado de los datos propios) y pruebas automáticas en GitHub. Incluye 94 pruebas automáticas de la API (`npm test`), revisión de seguridad y de accesibilidad, y modo de producción.
 
 ---
 
@@ -80,6 +80,15 @@ Deberías ver `Conectado a MariaDB ...`. Comprueba en el navegador: <http://loca
 - `requireRole('ALUMNO' | 'EMPRESA' | 'ADMIN')` protege cada ruta de la API; en el frontend, `RutaProtegida` hace lo mismo con las páginas.
 - El registro crea el usuario y su perfil (alumno o empresa) en una **transacción**.
 - Los administradores no se pueden registrar desde la web: se crean en la base de datos.
+- **Recuperar la contraseña**: «¿Has olvidado tu contraseña?» envía por correo un enlace que caduca en 1 hora y solo se puede usar una vez (en la base de datos solo se guarda su hash). La respuesta es la misma exista o no la cuenta, y se envía como mucho un correo cada 2 minutos por cuenta. Sin servidor de correo configurado, en desarrollo el enlace se muestra en la consola del backend; en producción la opción avisa de que no está disponible.
+- **Cambiar la contraseña cierra las demás sesiones**: los tokens emitidos antes dejan de valer (columna `sesiones_desde`).
+
+## Privacidad (RGPD)
+
+- Página **Política de privacidad** (`/privacidad`), enlazada en el pie de todas las páginas. Los datos del responsable se rellenan en `frontend/src/config/legal.js`.
+- Al registrarse hay que **aceptar la política de privacidad** con una casilla; se guarda la fecha (`privacidad_aceptada`).
+- En **Configuración**, cada usuario puede **descargar todos sus datos** (archivo JSON) y **eliminar su cuenta** con todos sus datos y archivos, confirmando con su contraseña.
+- Las fuentes tipográficas se sirven desde la propia web (sin Google Fonts) y no se usan cookies ni analítica.
 
 ## Archivos subidos
 
@@ -147,6 +156,9 @@ Incluye 4 ciclos, 20 tecnologías, currículums de ejemplo para 4 alumnos (`npm 
 | `DB_CONNECTION_LIMIT` | Conexiones máximas del pool | `10` |
 | `JWT_SECRET` | Secreto para firmar los tokens (obligatorio, mínimo 32 caracteres) | cadena aleatoria larga |
 | `JWT_EXPIRES_IN` | Duración del token | `8h` |
+| `SMTP_HOST` / `SMTP_PORT` | Servidor de correo para la recuperación de contraseña (opcional en desarrollo) | `smtp-relay.brevo.com` / `587` |
+| `SMTP_USER` / `SMTP_PASS` | Usuario y clave del servidor de correo | … |
+| `SMTP_FROM` | Remitente de los correos | `PractiFP <no-responder@tu-dominio.es>` |
 
 ### `frontend/.env`
 
@@ -236,6 +248,8 @@ cd backend
 npm test
 ```
 
+Además, **GitHub ejecuta las pruebas automáticamente** en cada `push` y en cada pull request (`.github/workflows/pruebas.yml`): las de la API con MariaDB, guardando los archivos en disco y en la base de datos, la compilación de la web y la revisión de vulnerabilidades de las dependencias. El resultado aparece en la pestaña **Actions** del repositorio y junto a cada commit.
+
 ## Seguridad
 
 - Contraseñas con **bcrypt**; tokens **JWT** firmados con HS256 (se rechazan tokens sin firma o con otro algoritmo).
@@ -243,7 +257,7 @@ npm test
 - Permisos por rol en cada ruta (`requireRole`) y comprobación de propiedad en ofertas, candidaturas, fases y proyectos.
 - **Consultas SQL parametrizadas** en toda la aplicación.
 - Validación de datos en el frontend y, de nuevo, en el backend, con errores por campo.
-- Límite de intentos fallidos en el inicio de sesión, el registro y los cambios de correo o contraseña.
+- Límite de intentos fallidos en el inicio de sesión, el registro, la recuperación y los cambios de correo o contraseña. El contador se guarda en la base de datos (tabla `INTENTOS`, sin guardar direcciones IP), así que funciona aunque haya varias copias del servidor, como en Vercel.
 - Archivos subidos: tipo, tamaño y firma del archivo comprobados; nombres aleatorios; currículums solo accesibles con permiso.
 - Cabeceras HTTP de seguridad (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Content-Security-Policy` y, en producción, `Strict-Transport-Security`).
 - Cuerpos JSON limitados a 100 KB; los errores internos no muestran detalles en producción.
@@ -362,9 +376,13 @@ Las rutas privadas necesitan la cabecera `Authorization: Bearer <token>`.
 
 Cuando un alumno consulta `/api/ofertas` o `/api/ofertas/:id`, cada oferta incluye además `esFavorita` y `miEstado` (estado de su candidatura); el detalle incluye `miCandidatura`. El detalle de una oferta incluye siempre sus `fases` y `resumenFases` (número de fases y duración mínima y máxima en días).
 | PUT | `/api/cuenta/email` | Con sesión | Cambiar el correo (`{ email, password }`) |
-| PUT | `/api/cuenta/password` | Con sesión | Cambiar la contraseña (`{ actual, nueva }`) |
+| PUT | `/api/cuenta/password` | Con sesión | Cambiar la contraseña (`{ actual, nueva }`); devuelve un `token` nuevo y cierra las demás sesiones |
+| GET | `/api/cuenta/datos` | Con sesión | Todos los datos de la cuenta (descarga JSON) |
+| DELETE | `/api/cuenta` | Con sesión | Eliminar la cuenta y todos sus datos (`{ password }`) |
+| POST | `/api/auth/recuperar` | Público | Enviar el enlace para cambiar la contraseña (`{ email }`) |
+| POST | `/api/auth/restablecer` | Público | Cambiar la contraseña con el código del enlace (`{ token, password }`) |
 
-Códigos de error habituales: `400` datos no válidos (con `detalles` por campo), `401` sin sesión o token no válido, `403` sin permiso o cuenta desactivada, `409` correo ya registrado, `429` demasiados intentos (10 fallos en 15 minutos en login o registro).
+Códigos de error habituales: `400` datos no válidos (con `detalles` por campo), `401` sin sesión o token no válido, `403` sin permiso o cuenta desactivada, `409` correo ya registrado, `429` demasiados intentos (10 fallos en 15 minutos en login o registro; 5 peticiones de recuperación en 15 minutos), `503` recuperación por correo no configurada.
 
 ---
 

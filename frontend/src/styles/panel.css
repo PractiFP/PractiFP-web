@@ -67,3 +67,8 @@
 .aviso--enlace span { flex: 1; }
 .aviso--enlace:hover { filter: brightness(.97); }
 .sin-margen { margin: 0; }
+
+/* Configuración: zona de acciones irreversibles */
+.zona-peligro { border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
+.zona-peligro .tarjeta__titulo { color: var(--bad); }
+.acciones-fila { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }

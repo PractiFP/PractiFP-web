@@ -10,7 +10,7 @@ import Campo from '../components/Campo.jsx';
 import Boton from '../components/Boton.jsx';
 import MensajeError from '../components/MensajeError.jsx';
 
-const INICIAL = { tipo: 'ALUMNO', nombre: '', apellidos: '', cicloId: '', localidad: '', email: '', password: '', password2: '' };
+const INICIAL = { tipo: 'ALUMNO', nombre: '', apellidos: '', cicloId: '', localidad: '', email: '', password: '', password2: '', aceptaPrivacidad: false };
 
 function esquema(tipo) {
   const comunes = {
@@ -18,6 +18,7 @@ function esquema(tipo) {
     email: [reglas.requerido(), reglas.email()],
     password: [reglas.requerido(), reglas.longitudMin(PASSWORD_MIN, `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres.`), reglas.longitudMax(72)],
     password2: [reglas.requerido('Repite la contraseña.'), reglas.igualA('password', 'Las contraseñas no coinciden.')],
+    aceptaPrivacidad: [(v) => (v === true ? null : 'Debes aceptar la política de privacidad para crear la cuenta.')],
   };
   return tipo === 'EMPRESA'
     ? { ...comunes, localidad: [reglas.requerido(), reglas.longitudMax(100)] }
@@ -34,7 +35,7 @@ export default function Registro() {
   const [errorGeneral, setErrorGeneral] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  const cambiar = (e) => setDatos((d) => ({ ...d, [e.target.name]: e.target.value }));
+  const cambiar = (e) => setDatos((d) => ({ ...d, [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
   const cambiarTipo = (e) => { setDatos((d) => ({ ...d, tipo: e.target.value })); setErrores({}); setErrorGeneral(null); };
 
   async function enviar(e) {
@@ -103,6 +104,18 @@ export default function Registro() {
           <div className="rejilla-2">
             <Campo etiqueta="Contraseña" name="password" tipo="password" autoComplete="new-password" value={datos.password} onChange={cambiar} error={errores.password} ayuda={`Mínimo ${PASSWORD_MIN} caracteres.`} />
             <Campo etiqueta="Repetir contraseña" name="password2" tipo="password" autoComplete="new-password" value={datos.password2} onChange={cambiar} error={errores.password2} />
+          </div>
+
+          <div className="campo">
+            <label className="casilla casilla--legal">
+              <input type="checkbox" name="aceptaPrivacidad" checked={datos.aceptaPrivacidad} onChange={cambiar}
+                aria-invalid={errores.aceptaPrivacidad ? true : undefined} aria-describedby={errores.aceptaPrivacidad ? 'error-privacidad' : undefined} />
+              <span>
+                He leído y acepto la <Link to="/privacidad" target="_blank" rel="noopener">política de privacidad</Link>{' '}
+                <span className="visualmente-oculto">(se abre en una pestaña nueva)</span>
+              </span>
+            </label>
+            {errores.aceptaPrivacidad && <span id="error-privacidad" className="campo__error">{errores.aceptaPrivacidad}</span>}
           </div>
 
           {errorGeneral && <MensajeError titulo="No se ha podido crear la cuenta" mensaje={errorGeneral} />}

@@ -5,9 +5,9 @@ import { env } from '../config/env.js';
 const CSP_WEB = [
   "default-src 'self'",
   "script-src 'self'",
-  // React aplica estilos en línea (atributo style); Google Fonts sirve la hoja de estilos de las fuentes
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  'font-src https://fonts.gstatic.com',
+  // React aplica estilos en línea (atributo style). Las fuentes se sirven desde la propia web
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   // Teselas del mapa, imágenes de proyectos y vistas previas locales (blob:)
   "img-src 'self' data: blob: https://tile.openstreetmap.org",
   "connect-src 'self'",

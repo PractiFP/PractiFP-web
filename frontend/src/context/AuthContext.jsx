@@ -61,11 +61,12 @@ export function AuthProvider({ children }) {
     return datos;
   }, []);
 
-  const cerrarSesion = useCallback(() => {
+  // `mensaje` solo si es texto: desde un botón llega el evento del clic
+  const cerrarSesion = useCallback((mensaje) => {
     borrarToken();
     setSalidaVoluntaria(true);
     setUsuario(null);
-    toast('Has cerrado sesión.');
+    toast(typeof mensaje === 'string' ? mensaje : 'Has cerrado sesión.');
   }, [toast]);
 
   const valor = useMemo(

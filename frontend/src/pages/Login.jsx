@@ -61,6 +61,7 @@ export default function Login() {
         <form className="formulario" onSubmit={enviar} noValidate>
           <Campo etiqueta="Correo electrónico" name="email" tipo="email" autoComplete="email" value={datos.email} onChange={cambiar} error={errores.email} />
           <Campo etiqueta="Contraseña" name="password" tipo="password" autoComplete="current-password" value={datos.password} onChange={cambiar} error={errores.password} />
+          <p className="auth__enlace"><Link to="/recuperar-contrasena">¿Has olvidado tu contraseña?</Link></p>
           {errorGeneral && <MensajeError titulo="No se ha podido iniciar sesión" mensaje={errorGeneral} />}
           <Boton type="submit" disabled={enviando}>{enviando ? 'Entrando…' : 'Entrar'}</Boton>
         </form>

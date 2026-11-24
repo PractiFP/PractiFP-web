@@ -98,7 +98,7 @@ Decisiones de la Fase 7 (administración):
 Decisiones de la Fase 8 (pruebas y mejoras):
 
 - **Pruebas con `node --test`**: el corredor de pruebas de Node, sin añadir dependencias. Usan una base de datos (`practifp_test`) y una carpeta de archivos separadas.
-- **Cabeceras de seguridad propias** en lugar de una librería como Helmet, para no añadir dependencias; la política de contenidos solo permite lo que usa la aplicación (Google Fonts y las teselas de OpenStreetMap).
+- **Cabeceras de seguridad propias** en lugar de una librería como Helmet, para no añadir dependencias; la política de contenidos solo permite lo que usa la aplicación (las teselas de OpenStreetMap; las fuentes se sirven desde la propia web).
 - **El backend sirve el frontend compilado** en producción (`SERVIR_FRONTEND=true`): un solo proceso, sin problemas de CORS.
 - **Colores de estado más oscuros** en modo claro para cumplir el contraste mínimo de WCAG AA.
 - **El botón del currículum** pasa a la celda del alumno en la lista de candidatos, para que la tabla quepa sin desplazamiento horizontal.
@@ -110,3 +110,18 @@ Decisiones del despliegue:
 - **Currículum de 4 MB como máximo** (antes 5 MB) en todos los modos, porque Vercel no admite peticiones de más de 4,5 MB.
 - **`bcryptjs` en lugar de `bcrypt`**: mismo algoritmo y hashes compatibles, pero sin código nativo, que da problemas al empaquetar la función de Vercel.
 - **TiDB Cloud** como base de datos gratuita compatible con MySQL (el plan gratuito de MySQL de otros proveedores ya no existe). Las pruebas automáticas pasan tanto en MariaDB como en TiDB. TiDB no aplica las restricciones `CHECK` salvo que se activen; el script de instalación intenta activarlas y, en cualquier caso, la aplicación valida esos datos.
+
+Decisiones de las mejoras posteriores (recuperación de contraseña, RGPD y pruebas en GitHub):
+
+- **Recuperación por correo con SMTP** (`nodemailer`): sirve con cualquier proveedor (Brevo, Gmail, el servidor del centro). El enlace lleva el código después de `#`, así que no se envía al servidor al abrir la página ni queda en registros; en la base de datos solo se guarda su hash SHA-256. Caduca en 1 hora, se usa una vez y se anula al pedir otro.
+- **La respuesta no revela si un correo está registrado**, y se envía como mucho un correo cada 2 minutos por cuenta para que nadie llene el buzón de otra persona.
+- **El enlace se construye con `FRONTEND_URL`** y nunca con la cabecera `Host` de la petición, que un atacante podría falsear para recibir el enlace.
+- **Cambiar la contraseña cierra las demás sesiones**: `USUARIOS.sesiones_desde` guarda el momento (segundos Unix, calculado en Node para evitar diferencias de reloj o zona horaria con la base de datos) y se rechazan los tokens emitidos antes.
+- **Límite de intentos en la base de datos** (tabla `INTENTOS`) en lugar de en memoria: en Vercel cada petición puede ir a una copia distinta del servidor. El intento se suma antes de procesar la petición y se resta si sale bien (restarlo después de responder no es fiable en Vercel, que puede congelar la función). La clave es un HMAC del límite y la IP: no se guardan direcciones IP.
+- **Actualización automática del esquema**: en la primera petición, la API añade a una base de datos ya instalada las columnas y tablas nuevas (`backend/src/config/migraciones.js`). Solo añade, nunca borra. Así la base de datos de producción se actualiza sola al desplegar.
+- **Eliminar la cuenta borra de verdad** los datos y los archivos (derecho de supresión). Esto no cambia la decisión de la Fase 7: el administrador sigue **desactivando** cuentas, no borrándolas; solo el propio usuario puede eliminar la suya. La última cuenta de administración no se puede eliminar.
+- **Descargar mis datos** incluye solo los datos del propio usuario: una empresa ve cuántas candidaturas tiene cada oferta, pero no los datos de los candidatos.
+- **Consentimiento expreso**: casilla sin marcar por defecto; el backend solo acepta el valor `true` y guarda la fecha.
+- **Fuentes servidas desde la propia web** (paquetes `@fontsource`) en lugar de Google Fonts, que recibía la IP de cada visitante. La política de seguridad (CSP) queda en `font-src 'self'`.
+- **GitHub Actions** ejecuta las pruebas de la API con MariaDB 11.4 en los dos modos de almacén de archivos, compila la web y revisa las vulnerabilidades de las dependencias.
+

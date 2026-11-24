@@ -9,6 +9,7 @@ import rutas from './routes/index.js';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { cabecerasSeguridad } from './middlewares/seguridad.js';
+import { esquemaAlDia } from './config/migraciones.js';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(cabecerasSeguridad);
 app.use('/api', cors({ origin: env.frontendUrl }));
 app.use(express.json({ limit: '100kb' }));
 
+// Añade a una base de datos ya instalada las tablas o columnas nuevas (una vez por proceso)
+app.use('/api', esquemaAlDia);
 app.use('/api', rutas);
 app.use('/api', notFound);
 

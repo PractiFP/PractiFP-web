@@ -159,3 +159,15 @@
 .detalle { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
 @media (max-width: 860px) { .detalle { grid-template-columns: 1fr; } }
 .nota .icono { vertical-align: -3px; }
+
+.pie__enlaces { display: flex; gap: 16px; flex-wrap: wrap; }
+.pie__enlaces a { color: inherit; }
+
+/* Textos legales (política de privacidad) */
+.texto-legal { max-width: 780px; margin: 32px auto; padding: 32px; line-height: 1.6; }
+.texto-legal h1 { font-size: 1.9rem; }
+.texto-legal h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+.texto-legal p, .texto-legal ul { margin: 0 0 10px; }
+.texto-legal ul { padding-left: 1.2em; }
+.texto-legal li { margin-bottom: 6px; }
+@media (max-width: 600px) { .texto-legal { padding: 20px; margin: 16px auto; } }

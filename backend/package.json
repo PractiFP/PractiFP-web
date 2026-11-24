@@ -23,7 +23,8 @@
     "express": "^4.22.3",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.5.5",
-    "multer": "^2.5.0"
+    "multer": "^2.5.0",
+    "nodemailer": "^10.6.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
