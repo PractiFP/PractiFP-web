@@ -108,6 +108,8 @@ describe('Recuperar la contraseña', () => {
     try {
       const r = await api('POST', '/auth/recuperar', { cuerpo: { email: CUENTAS.carlos } });
       assert.equal(r.status, 503);
+      // En producción se ocultan los errores inesperados, pero este aviso es de la aplicación y se muestra
+      assert.match(r.error.mensaje, /no está disponible/);
     } finally {
       env.nodeEnv = anterior;
     }
